@@ -24,7 +24,9 @@ PUBLIC_DIR = BASE_DIR / "public"
 app = Flask(__name__, static_folder=str(PUBLIC_DIR), static_url_path="")
 
 # Reads TYPESAFE_API_KEY from the environment. See .env.example.
-client = TypeSafeClient()
+# TypeSafeClient() raises without a key, so only create it when one is set;
+# otherwise the server still runs and the browser uses its heuristic bot.
+client = TypeSafeClient() if os.environ.get("TYPESAFE_API_KEY") else None
 
 
 @app.route("/")
@@ -34,6 +36,9 @@ def index():
 
 @app.route("/api/decide-placement", methods=["POST"])
 def decide_placement():
+    if client is None:
+        return jsonify({"error": "TYPESAFE_API_KEY is not set on the server"}), 503
+
     data = request.get_json(force=True, silent=True) or {}
 
     board = data.get("board")
