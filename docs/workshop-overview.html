@@ -123,6 +123,30 @@
   .lane.api { --lane-color: var(--lane-api); }
   @media (max-width: 720px) { .flow { grid-template-columns: 1fr; } }
 
+  /* sequence diagram */
+  .diagram { margin: 0; display: flex; flex-direction: column; gap: 10px; }
+  .diagram-scroll { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px; }
+  .diagram svg { display: block; width: 100%; min-width: 720px; height: auto; color: var(--ink); }
+  .diagram figcaption { font-size: 13.5px; color: var(--muted); max-width: 72ch; }
+  .dg-head { fill: var(--surface-2); stroke: var(--line); }
+  .dg-life { stroke: var(--line); stroke-width: 1.5; stroke-dasharray: 4 5; }
+  .dg-act { fill: var(--surface); stroke: var(--accent); stroke-width: 1.5; }
+  .dg-act-warn { stroke: var(--amber); fill: var(--amber-soft); }
+  .dg-msg { stroke: currentColor; stroke-width: 1.5; }
+  .dg-thin { stroke: var(--muted); stroke-width: 1.2; fill: none; }
+  .dg-failzone { fill: none; stroke: var(--amber); stroke-width: 1.2; stroke-dasharray: 5 4; }
+  .dg-failmsg { stroke: var(--amber); stroke-width: 1.5; stroke-dasharray: 6 4; }
+  .dg-arrowhead { fill: currentColor; }
+  .dg-arrowhead-warn { fill: var(--amber); }
+  .dg-t { fill: currentColor; font-family: var(--font-body); font-size: 12.5px; font-weight: 600; }
+  .dg-m { fill: var(--muted); font-family: var(--font-mono); font-size: 11px; }
+  .dg-warn-t { fill: var(--amber); }
+  .dg-screen { fill: var(--screen); }
+  .dg-cell { fill: #6b778a; }
+  .dg-falling { fill: #9a6fd6; }
+  .dg-pick { fill: var(--accent); }
+  .dg-alt { fill: none; stroke: #c9d2df; stroke-width: 1; stroke-dasharray: 2 1.5; }
+
   /* decision demo */
   .demo { display: grid; grid-template-columns: auto 1fr; gap: 28px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 22px; align-items: start; }
   .demo canvas { display: block; width: 200px; height: 400px; border-radius: 6px; }
@@ -280,34 +304,83 @@
   <section>
     <div class="section-head">
       <span class="eyebrow">What happens for every piece</span>
-      <h2>Three parts, six steps</h2>
+      <h2>One piece, one Jev call</h2>
     </div>
-    <div class="flow">
-      <div class="lane browser">
-        <span class="lane-name">Browser</span>
-        <h3><code>public/index.html</code></h3>
-        <ol>
-          <li><span class="step">1</span><span>Lists every legal placement for the falling piece.</span></li>
-          <li><span class="step">2</span><span>Sends the board, the piece queue and the placements to <code>POST /api/decide-placement</code>.</span></li>
-          <li><span class="step">6</span><span>Rotates and slides the piece one step per tick toward Jev's pick, then hard-drops it.</span></li>
-        </ol>
+    <figure class="diagram">
+      <div class="diagram-scroll">
+      <svg viewBox="0 0 960 700" role="img" aria-label="Sequence of one Jev decision: the browser lists every legal placement for the falling piece and posts them to the Flask server, which turns them into a Choice question and calls TypeSafe's system_one endpoint; Jev returns the chosen id, confidence and probabilities, the browser animates the piece into place and repeats for the next piece. If the call fails or times out after 4 seconds, the browser uses the heuristic and reports it to /api/log-fallback.">
+      <defs>
+        <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="dg-arrowhead"/></marker>
+        <marker id="arrw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="dg-arrowhead-warn"/></marker>
+      </defs>
+      <rect class="dg-screen" x="38" y="90" width="94" height="184" rx="3"/>
+      <rect class="dg-cell" x="40.5" y="227.5" width="8" height="8"/>
+      <rect class="dg-cell" x="112.5" y="227.5" width="8" height="8"/>
+      <rect class="dg-cell" x="121.5" y="227.5" width="8" height="8"/>
+      <rect class="dg-cell" x="40.5" y="236.5" width="8" height="8"/>
+      <rect class="dg-cell" x="49.5" y="236.5" width="8" height="8"/>
+      <rect class="dg-cell" x="85.5" y="236.5" width="8" height="8"/>
+      <rect class="dg-cell" x="103.5" y="236.5" width="8" height="8"/>
+      <rect class="dg-cell" x="112.5" y="236.5" width="8" height="8"/>
+      <rect class="dg-cell" x="121.5" y="236.5" width="8" height="8"/>
+      <rect class="dg-cell" x="40.5" y="245.5" width="8" height="8"/>
+      <rect class="dg-cell" x="49.5" y="245.5" width="8" height="8"/>
+      <rect class="dg-cell" x="58.5" y="245.5" width="8" height="8"/>
+      <rect class="dg-cell" x="76.5" y="245.5" width="8" height="8"/>
+      <rect class="dg-cell" x="85.5" y="245.5" width="8" height="8"/>
+      <rect class="dg-cell" x="94.5" y="245.5" width="8" height="8"/>
+      <rect class="dg-cell" x="103.5" y="245.5" width="8" height="8"/>
+      <rect class="dg-cell" x="112.5" y="245.5" width="8" height="8"/>
+      <rect class="dg-cell" x="121.5" y="245.5" width="8" height="8"/>
+      <rect class="dg-cell" x="40.5" y="254.5" width="8" height="8"/>
+      <rect class="dg-cell" x="49.5" y="254.5" width="8" height="8"/>
+      <rect class="dg-cell" x="58.5" y="254.5" width="8" height="8"/>
+      <rect class="dg-cell" x="67.5" y="254.5" width="8" height="8"/>
+      <rect class="dg-cell" x="76.5" y="254.5" width="8" height="8"/>
+      <rect class="dg-cell" x="94.5" y="254.5" width="8" height="8"/>
+      <rect class="dg-cell" x="103.5" y="254.5" width="8" height="8"/>
+      <rect class="dg-cell" x="112.5" y="254.5" width="8" height="8"/>
+      <rect class="dg-cell" x="121.5" y="254.5" width="8" height="8"/>
+      <rect class="dg-cell" x="40.5" y="263.5" width="8" height="8"/>
+      <rect class="dg-cell" x="49.5" y="263.5" width="8" height="8"/>
+      <rect class="dg-cell" x="58.5" y="263.5" width="8" height="8"/>
+      <rect class="dg-cell" x="67.5" y="263.5" width="8" height="8"/>
+      <rect class="dg-cell" x="76.5" y="263.5" width="8" height="8"/>
+      <rect class="dg-cell" x="85.5" y="263.5" width="8" height="8"/>
+      <rect class="dg-cell" x="94.5" y="263.5" width="8" height="8"/>
+      <rect class="dg-cell" x="103.5" y="263.5" width="8" height="8"/>
+      <rect class="dg-cell" x="121.5" y="263.5" width="8" height="8"/>
+      <rect class="dg-falling" x="76.5" y="101.5" width="8" height="8"/><rect class="dg-falling" x="67.5" y="110.5" width="8" height="8"/><rect class="dg-falling" x="76.5" y="110.5" width="8" height="8"/><rect class="dg-falling" x="85.5" y="110.5" width="8" height="8"/>
+      <rect class="dg-alt" x="85.5" y="227.5" width="8" height="8"/><rect class="dg-alt" x="94.5" y="227.5" width="8" height="8"/><rect class="dg-alt" x="103.5" y="227.5" width="8" height="8"/><rect class="dg-alt" x="94.5" y="218.5" width="8" height="8"/>
+      <rect class="dg-pick" x="58.5" y="236.5" width="8" height="8"/><rect class="dg-pick" x="67.5" y="236.5" width="8" height="8"/><rect class="dg-pick" x="76.5" y="236.5" width="8" height="8"/><rect class="dg-pick" x="67.5" y="245.5" width="8" height="8"/>
+      <rect class="dg-head" x="230" y="16" width="180" height="44" rx="6"/><text class="dg-t" x="320" y="35" text-anchor="middle">Browser</text><text class="dg-m" x="320" y="51" text-anchor="middle">public/index.html</text><line class="dg-life" x1="320" y1="60" x2="320" y2="692"/>
+      <rect class="dg-head" x="510" y="16" width="180" height="44" rx="6"/><text class="dg-t" x="600" y="35" text-anchor="middle">Flask server</text><text class="dg-m" x="600" y="51" text-anchor="middle">server/app.py</text><line class="dg-life" x1="600" y1="60" x2="600" y2="692"/>
+      <rect class="dg-head" x="770" y="16" width="180" height="44" rx="6"/><text class="dg-t" x="860" y="35" text-anchor="middle">TypeSafe API</text><text class="dg-m" x="860" y="51" text-anchor="middle">api.typesafe.ai</text><line class="dg-life" x1="860" y1="60" x2="860" y2="692"/>
+      <rect class="dg-act" x="220" y="88" width="200" height="44" rx="6"/><text class="dg-t" x="320.0" y="107" text-anchor="middle">① enumeratePlacements()</text><text class="dg-m" x="320.0" y="123" text-anchor="middle">rotation × column → 9–34</text>
+      <line class="dg-thin" x1="134" y1="104" x2="218" y2="104" marker-end="url(#arr)"/>
+      <line class="dg-msg" x1="322" y1="178" x2="597" y2="178" marker-end="url(#arr)"/><text class="dg-t" x="459.5" y="170" text-anchor="middle">② POST /api/decide-placement</text><text class="dg-m" x="459.5" y="194" text-anchor="middle">board · pieces · legalPlacements[]</text><text class="dg-m dg-warn-t" x="459.5" y="208" text-anchor="middle">browser gives up after 4 s</text>
+      <rect class="dg-act" x="500" y="222" width="200" height="44" rx="6"/><text class="dg-t" x="600.0" y="241" text-anchor="middle">③ build criteria</text><text class="dg-m" x="600.0" y="257" text-anchor="middle">p0…pN · one sentence each</text>
+      <line class="dg-msg" x1="602" y1="304" x2="857" y2="304" marker-end="url(#arr)"/><text class="dg-t" x="729.5" y="296" text-anchor="middle">④ client.system_one()</text><text class="dg-m" x="729.5" y="320" text-anchor="middle">state + Choice · jev-latest</text>
+      <rect class="dg-act" x="770" y="332" width="180" height="44" rx="6"/><text class="dg-t" x="860.0" y="351" text-anchor="middle">⑤ Jev ranks options</text><text class="dg-m" x="860.0" y="367" text-anchor="middle">served by jev-1.13.0</text>
+      <line class="dg-msg" x1="858" y1="420" x2="603" y2="420" marker-end="url(#arr)"/><text class="dg-t" x="730.5" y="412" text-anchor="middle">answers["placement"]</text><text class="dg-m" x="730.5" y="436" text-anchor="middle">choice · confidence · probabilities</text>
+      <line class="dg-msg" x1="598" y1="492" x2="323" y2="492" marker-end="url(#arr)"/><text class="dg-t" x="460.5" y="484" text-anchor="middle">⑥ chosenId + confidence</text><text class="dg-m" x="460.5" y="508" text-anchor="middle">≈260–370 ms round trip</text><text class="dg-m" x="460.5" y="522" text-anchor="middle">logs [jev] piece T: jev chose p7</text>
+      <rect class="dg-act" x="220" y="540" width="200" height="44" rx="6"/><text class="dg-t" x="320.0" y="559" text-anchor="middle">⑦ animate, hard drop</text><text class="dg-m" x="320.0" y="575" text-anchor="middle">1 move per tick → lock</text>
+      <polyline class="dg-thin" points="220,562 198,562 198,124 218,124" marker-end="url(#arr)"/>
+      <text class="dg-m" transform="translate(190 420) rotate(-90)" text-anchor="middle">next piece</text>
+      <rect class="dg-failzone" x="210" y="604" width="420" height="88" rx="8"/>
+      <text class="dg-m dg-warn-t" x="224" y="621">if ② fails</text>
+      <rect class="dg-act dg-act-warn" x="224" y="632" width="192" height="44" rx="6"/><text class="dg-t" x="320" y="651" text-anchor="middle">pickHeuristic()</text><text class="dg-m" x="320" y="667" text-anchor="middle">timeout · 5xx · bad id</text>
+      <line class="dg-failmsg" x1="418" y1="654" x2="597" y2="654" marker-end="url(#arrw)"/><text class="dg-t" x="508" y="646" text-anchor="middle">POST /api/log-fallback</text><text class="dg-m" x="508" y="670" text-anchor="middle">logs [heuristic] + reason</text>
+      <text class="dg-m" x="40" y="80">the board</text>
+      <text class="dg-m" x="40" y="300">34 legal spots</text>
+      <text class="dg-m" x="40" y="315">for a T piece</text>
+      <rect class="dg-pick" x="40" y="334" width="9" height="9"/><text class="dg-m" x="55" y="342">Jev’s pick, p7</text>
+      <rect class="dg-alt" x="40" y="352" width="9" height="9"/><text class="dg-m" x="55" y="360">another option</text>
+      <rect class="dg-falling" x="40" y="370" width="9" height="9"/><text class="dg-m" x="55" y="378">falling piece</text>
+      </svg>
       </div>
-      <div class="lane server">
-        <span class="lane-name">Flask server</span>
-        <h3><code>server/app.py</code></h3>
-        <ol>
-          <li><span class="step">3</span><span>Turns each placement into a one-sentence option, keyed <code>p0</code>, <code>p1</code>, …</span></li>
-          <li><span class="step">4</span><span>Calls <code>client.system_one(...)</code> with the board as <code>state</code> and one <code>Choice</code> question. The API key stays here, never in the browser.</span></li>
-        </ol>
-      </div>
-      <div class="lane api">
-        <span class="lane-name">TypeSafe API</span>
-        <h3>Jev</h3>
-        <ol>
-          <li><span class="step">5</span><span>Returns the chosen id, a confidence score and a probability for every option, all in one response.</span></li>
-        </ol>
-      </div>
-    </div>
+      <figcaption>One Jev call per piece. Steps ①–⑦ repeat for every piece, and the amber box is what happens when the call can't complete. Latency and model version come from a real test run; the board is an example.</figcaption>
+    </figure>
   </section>
 
   <section>
