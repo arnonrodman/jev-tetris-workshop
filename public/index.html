@@ -1,0 +1,948 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Jev Tetris Workshop</title>
+<style>
+  :root {
+    --bg: #f5f6fa;
+    --card-bg: #ffffff;
+    --border: #e4e7ee;
+    --text: #1f2430;
+    --text-muted: #6b7280;
+    --accent: #4f46e5;
+    --accent-soft: #eef2ff;
+    --good: #16a34a;
+    --warn: #d97706;
+    --bad: #dc2626;
+    --shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 4px 12px rgba(16, 24, 40, 0.06);
+    --radius: 14px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+
+  body { margin: 0; background: var(--bg); color: var(--text); }
+
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 28px 20px 60px; }
+
+  .topbar { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
+
+  .logo {
+    width: 34px; height: 34px; flex-shrink: 0;
+    display: grid; grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(2, 1fr);
+    gap: 3px; padding: 3px;
+    background: #0f1220; border-radius: 9px;
+  }
+  .logo span { border-radius: 2px; }
+  .logo span:nth-child(1) { background: #38bdf8; }
+  .logo span:nth-child(2) { background: #c084fc; }
+  .logo span:nth-child(3) { background: #4ade80; }
+  .logo span:nth-child(4) { background: #fb923c; }
+
+  .topbar h1 { margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -0.01em; }
+
+  .subtitle {
+    margin: 0 0 22px;
+    color: var(--text-muted);
+    font-size: 14px;
+    max-width: 680px;
+    line-height: 1.5;
+  }
+  .subtitle code {
+    background: var(--accent-soft);
+    color: var(--accent);
+    padding: 1px 5px;
+    border-radius: 5px;
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 20px;
+    align-items: start;
+  }
+
+  @media (max-width: 760px) {
+    .layout { grid-template-columns: 1fr; }
+  }
+
+  .board-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .screen-bezel {
+    width: 100%;
+    max-width: 300px;
+    background: #0f1220;
+    border-radius: 16px;
+    padding: 10px;
+    box-shadow: inset 0 2px 8px rgba(0,0,0,0.5);
+  }
+
+  #board {
+    background: #0b0e1a;
+    border-radius: 8px;
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .board-footer { display: flex; gap: 8px; width: 100%; max-width: 300px; }
+
+  .btn {
+    flex: 1;
+    border: 1px solid var(--border);
+    background: #fff;
+    color: var(--text);
+    padding: 9px 12px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, transform 0.1s;
+  }
+  .btn:hover { background: #f9fafb; }
+  .btn:active { transform: scale(0.97); }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn.primary:hover { background: #4338ca; }
+
+  .side { display: flex; flex-direction: column; gap: 16px; }
+
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 16px 18px;
+  }
+
+  .card h2 {
+    margin: 0 0 12px;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    font-weight: 800;
+  }
+
+  .switch-row, .slider-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 6px;
+  }
+  .slider-row input[type="range"] { width: 55%; accent-color: var(--accent); }
+  .switch-row input[type="checkbox"] { width: 34px; height: 20px; accent-color: var(--accent); }
+
+  .hint { color: var(--text-muted); font-size: 12.5px; line-height: 1.5; margin: 6px 0 0; }
+
+  .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; text-align: center; }
+  .stat-label {
+    display: block; font-size: 10.5px; color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: 0.04em;
+  }
+  .stat-val {
+    display: block; font-size: 20px; font-weight: 800; margin-top: 2px;
+    font-variant-numeric: tabular-nums;
+  }
+  .stat-val.small { font-size: 13px; font-weight: 700; }
+
+  .preview-row { display: flex; gap: 16px; }
+  .preview-label {
+    font-size: 10.5px; color: var(--text-muted); margin-bottom: 4px;
+    text-transform: uppercase; letter-spacing: 0.04em;
+  }
+  #nextCanvas, #holdCanvas {
+    background: #f9fafb;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+
+  .ai-card { border-color: var(--accent); }
+
+  .badge {
+    display: inline-block;
+    font-size: 10.5px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 3px 9px;
+    border-radius: 999px;
+    margin-bottom: 10px;
+  }
+  .badge-idle { background: #f1f2f5; color: var(--text-muted); }
+  .badge-jev { background: var(--accent-soft); color: var(--accent); }
+  .badge-fallback { background: #fef3c7; color: var(--warn); }
+  .badge-error { background: #fee2e2; color: var(--bad); }
+
+  .ai-description { font-size: 13px; line-height: 1.5; margin: 0 0 12px; min-height: 38px; }
+
+  .confidence-row { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+  .confidence-bar { flex: 1; height: 8px; background: #f1f2f5; border-radius: 999px; overflow: hidden; }
+  .confidence-fill {
+    height: 100%; width: 0%;
+    background: linear-gradient(90deg, #a5b4fc, var(--accent));
+    transition: width 0.3s ease;
+  }
+
+  .prob-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
+  .prob-item { display: grid; grid-template-columns: 46px 1fr 34px; align-items: center; gap: 8px; font-size: 11.5px; }
+  .prob-item .prob-bar-track { height: 6px; background: #f1f2f5; border-radius: 999px; overflow: hidden; }
+  .prob-item .prob-bar-fill { height: 100%; background: #c7d2fe; }
+  .prob-item.chosen .prob-bar-fill { background: var(--accent); }
+  .prob-item.chosen span:first-child { color: var(--accent); font-weight: 800; }
+
+  .latency-row { display: flex; justify-content: space-between; font-size: 12px; }
+
+  .footer { margin-top: 30px; text-align: center; font-size: 12px; color: var(--text-muted); }
+  .footer code { background: var(--accent-soft); color: var(--accent); padding: 1px 5px; border-radius: 5px; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="topbar">
+        <div class="logo"><span></span><span></span><span></span><span></span></div>
+        <h1>Jev plays Tetris</h1>
+      </div>
+      <p class="subtitle">A one-page workshop demo of TypeSafe AI's <code>Jev</code> System One model choosing every move through the <strong>Choice</strong> primitive.</p>
+    </header>
+
+    <main class="layout">
+      <section class="board-card">
+        <div class="screen-bezel">
+          <canvas id="board" width="300" height="600"></canvas>
+        </div>
+        <div class="board-footer">
+          <button id="startBtn" class="btn primary">Start</button>
+          <button id="pauseBtn" class="btn">Pause</button>
+          <button id="resetBtn" class="btn">Reset</button>
+        </div>
+      </section>
+
+      <aside class="side">
+        <div class="card">
+          <h2>Mode</h2>
+          <label class="switch-row">
+            <span>AI (Jev) control</span>
+            <input type="checkbox" id="aiToggle" checked />
+          </label>
+          <p class="hint">Turn this off to play manually with the arrow keys (Z/X rotate, Space hard drop, C hold).</p>
+          <label class="slider-row">
+            <span>Speed</span>
+            <input type="range" id="speedSlider" min="80" max="800" value="350" step="10" />
+          </label>
+        </div>
+
+        <div class="card">
+          <h2>Score</h2>
+          <div class="stat-grid">
+            <div><span class="stat-label">Score</span><span id="scoreVal" class="stat-val">0</span></div>
+            <div><span class="stat-label">Lines</span><span id="linesVal" class="stat-val">0</span></div>
+            <div><span class="stat-label">Level</span><span id="levelVal" class="stat-val">1</span></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Next / Hold</h2>
+          <div class="preview-row">
+            <div>
+              <div class="preview-label">Next</div>
+              <canvas id="nextCanvas" width="96" height="96"></canvas>
+            </div>
+            <div>
+              <div class="preview-label">Hold</div>
+              <canvas id="holdCanvas" width="96" height="96"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="card ai-card">
+          <h2>Jev's decision</h2>
+          <div id="aiSource" class="badge badge-idle">idle</div>
+          <p id="aiDescription" class="ai-description">Waiting for the first piece…</p>
+          <div class="confidence-row">
+            <span class="stat-label">Confidence</span>
+            <div class="confidence-bar"><div id="confidenceFill" class="confidence-fill"></div></div>
+            <span id="confidenceVal" class="stat-val small">–</span>
+          </div>
+          <div id="probList" class="prob-list"></div>
+          <div class="latency-row">
+            <span class="stat-label">Latency</span>
+            <span id="latencyVal" class="stat-val small">–</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>What's happening</h2>
+          <p class="hint">
+            Each time a piece spawns, the browser enumerates every legal final placement (rotation × column),
+            describes each one in plain language, and sends them to the server as <em>Choice</em> options.
+            The server calls TypeSafe's <code>jev-latest</code> model with the board as <em>state</em>.
+            Jev returns the chosen placement plus a full probability distribution and a confidence score —
+            shown live on the left.
+          </p>
+        </div>
+      </aside>
+    </main>
+
+    <footer class="footer">
+      Built for a TypeSafe AI (Jev) workshop. See <code>README.md</code> for setup and exercises.
+    </footer>
+  </div>
+
+  <script>
+// =============================================================================
+// Jev Tetris Workshop — client-side game engine, renderer, and AI integration.
+// This whole app is a single self-contained page: no external JS/CSS/build
+// step. The only network call it makes is to our own Flask server at
+// POST /api/decide-placement, which is the one place the TypeSafe API key
+// is used (server-side only — see server/app.py).
+// =============================================================================
+
+// ---------- constants ----------
+const COLS = 10;
+const ROWS = 20;
+
+// Each piece type lists only its *unique* resulting shapes (duplicate rotation
+// states that produce an identical silhouette are collapsed) to keep the
+// number of Choice options — and therefore tokens sent to Jev — as small as
+// the game actually needs.
+const SHAPES = {
+  I: { color: "#38bdf8", states: [
+    [[1, 0], [1, 1], [1, 2], [1, 3]],
+    [[0, 2], [1, 2], [2, 2], [3, 2]],
+  ], unique: [0, 1] },
+  O: { color: "#facc15", states: [
+    [[0, 1], [0, 2], [1, 1], [1, 2]],
+  ], unique: [0] },
+  T: { color: "#c084fc", states: [
+    [[0, 1], [1, 0], [1, 1], [1, 2]],
+    [[0, 1], [1, 1], [1, 2], [2, 1]],
+    [[1, 0], [1, 1], [1, 2], [2, 1]],
+    [[0, 1], [1, 0], [1, 1], [2, 1]],
+  ], unique: [0, 1, 2, 3] },
+  S: { color: "#4ade80", states: [
+    [[0, 1], [0, 2], [1, 0], [1, 1]],
+    [[0, 1], [1, 1], [1, 2], [2, 2]],
+  ], unique: [0, 1] },
+  Z: { color: "#f87171", states: [
+    [[0, 0], [0, 1], [1, 1], [1, 2]],
+    [[0, 2], [1, 1], [1, 2], [2, 1]],
+  ], unique: [0, 1] },
+  J: { color: "#60a5fa", states: [
+    [[0, 0], [1, 0], [1, 1], [1, 2]],
+    [[0, 1], [0, 2], [1, 1], [2, 1]],
+    [[1, 0], [1, 1], [1, 2], [2, 2]],
+    [[0, 1], [1, 1], [2, 0], [2, 1]],
+  ], unique: [0, 1, 2, 3] },
+  L: { color: "#fb923c", states: [
+    [[0, 2], [1, 0], [1, 1], [1, 2]],
+    [[0, 1], [1, 1], [2, 1], [2, 2]],
+    [[1, 0], [1, 1], [1, 2], [2, 0]],
+    [[0, 0], [0, 1], [1, 1], [2, 1]],
+  ], unique: [0, 1, 2, 3] },
+};
+const PIECE_TYPES = Object.keys(SHAPES);
+
+// ---------- pure game logic ----------
+function emptyBoard() {
+  return Array.from({ length: ROWS }, () => Array(COLS).fill(null));
+}
+
+function cellsFor(type, rotation) {
+  const def = SHAPES[type];
+  return def.states[rotation % def.states.length];
+}
+
+function fits(board, type, rotation, row, col) {
+  for (const [dr, dc] of cellsFor(type, rotation)) {
+    const r = row + dr, c = col + dc;
+    if (c < 0 || c >= COLS || r >= ROWS) return false;
+    if (r >= 0 && board[r][c]) return false;
+  }
+  return true;
+}
+
+function colRangeFor(type, rotation) {
+  const dcs = cellsFor(type, rotation).map((cell) => cell[1]);
+  const minDc = Math.min(...dcs), maxDc = Math.max(...dcs);
+  return { minCol: -minDc, maxCol: COLS - 1 - maxDc };
+}
+
+// Simulates a straight hard drop (no spins) and returns the resting row, or
+// null if the piece cannot land anywhere in bounds (used to discard illegal
+// placements from the Choice options sent to Jev).
+function dropRow(board, type, rotation, col) {
+  let row = -4;
+  while (!fits(board, type, rotation, row, col) && row < ROWS) row++;
+  if (row >= ROWS) return null;
+  while (fits(board, type, rotation, row + 1, col)) row++;
+  return row;
+}
+
+// Returns a new board with the piece locked in, or null if any cell of the
+// piece would rest above the visible board (i.e. a top-out).
+function lockedBoard(board, type, rotation, row, col, color) {
+  const copy = board.map((r) => r.slice());
+  for (const [dr, dc] of cellsFor(type, rotation)) {
+    const r = row + dr, c = col + dc;
+    if (r < 0) return null;
+    copy[r][c] = color;
+  }
+  return copy;
+}
+
+function clearLines(board) {
+  const kept = board.filter((row) => row.some((cell) => !cell));
+  const cleared = ROWS - kept.length;
+  while (kept.length < ROWS) kept.unshift(Array(COLS).fill(null));
+  return { board: kept, cleared };
+}
+
+function heights(board) {
+  const hs = [];
+  for (let c = 0; c < COLS; c++) {
+    let h = 0;
+    for (let r = 0; r < ROWS; r++) {
+      if (board[r][c]) { h = ROWS - r; break; }
+    }
+    hs.push(h);
+  }
+  return hs;
+}
+
+function holesCount(board) {
+  let holes = 0;
+  for (let c = 0; c < COLS; c++) {
+    let seenBlock = false;
+    for (let r = 0; r < ROWS; r++) {
+      if (board[r][c]) seenBlock = true;
+      else if (seenBlock) holes++;
+    }
+  }
+  return holes;
+}
+
+function bumpiness(hs) {
+  let b = 0;
+  for (let i = 0; i < hs.length - 1; i++) b += Math.abs(hs[i] - hs[i + 1]);
+  return b;
+}
+
+// Enumerates every legal final resting placement for `type` on `board`.
+// This is the full menu of options Jev is asked to choose from.
+function enumeratePlacements(board, type) {
+  const out = [];
+  let idx = 0;
+  for (const rotation of SHAPES[type].unique) {
+    const { minCol, maxCol } = colRangeFor(type, rotation);
+    for (let col = minCol; col <= maxCol; col++) {
+      const row = dropRow(board, type, rotation, col);
+      if (row === null) continue;
+      const afterLock = lockedBoard(board, type, rotation, row, col, SHAPES[type].color);
+      if (!afterLock) continue;
+      const { board: afterClear, cleared } = clearLines(afterLock);
+      const hs = heights(afterClear);
+      const columns = [...new Set(cellsFor(type, rotation).map(([, dc]) => col + dc))].sort((a, b) => a - b);
+      out.push({
+        id: "p" + idx++,
+        rotation,
+        col,
+        row,
+        columns,
+        linesCleared: cleared,
+        holes: holesCount(afterClear),
+        aggregateHeight: hs.reduce((a, b) => a + b, 0),
+        maxHeight: Math.max(...hs),
+        bumpiness: bumpiness(hs),
+      });
+    }
+  }
+  return out;
+}
+
+// Classic hand-tuned heuristic (Pierre Dellacherie-style weights), used as an
+// offline fallback whenever Jev is unavailable or times out, and as a
+// baseline you can compare Jev's choices against.
+function heuristicScore(p) {
+  return (
+    -0.51 * p.aggregateHeight +
+    0.76 * p.linesCleared -
+    0.36 * p.holes -
+    0.18 * p.bumpiness
+  );
+}
+
+function pickHeuristic(placements) {
+  return placements.reduce((best, p) => (heuristicScore(p) > heuristicScore(best) ? p : best));
+}
+
+function boardToAscii(board) {
+  return board.map((row) => row.map((cell) => (cell ? "X" : ".")).join(""));
+}
+
+// 7-bag randomizer: every bag is a shuffled permutation of all 7 pieces, which
+// is the standard modern-Tetris way to avoid unlucky long droughts of a piece.
+function makeBag() {
+  const bag = [...PIECE_TYPES];
+  for (let i = bag.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [bag[i], bag[j]] = [bag[j], bag[i]];
+  }
+  return bag;
+}
+
+// ---------- game state ----------
+const state = {
+  board: emptyBoard(),
+  bag: [],
+  queue: [],
+  current: null, // { type, rotation, row, col }
+  hold: null,
+  holdUsed: false,
+  score: 0,
+  lines: 0,
+  level: 1,
+  running: false,
+  gameOver: false,
+  aiEnabled: true,
+  aiThinking: false,
+  aiTarget: null, // { rotation, col } chosen for the current piece
+  tickMs: 350,
+  accumulator: 0,
+  lastTime: 0,
+};
+
+function refillQueue() {
+  while (state.queue.length < 3) {
+    if (state.bag.length === 0) state.bag = makeBag();
+    state.queue.push(state.bag.shift());
+  }
+}
+
+function spawnPiece() {
+  refillQueue();
+  const type = state.queue.shift();
+  refillQueue();
+  const rotation = 0;
+  const { minCol, maxCol } = colRangeFor(type, rotation);
+  const col = Math.floor((minCol + maxCol) / 2);
+  const piece = { type, rotation, row: -2, col };
+  if (!fits(state.board, type, rotation, piece.row, piece.col)) {
+    state.gameOver = true;
+    state.running = false;
+    return;
+  }
+  state.current = piece;
+  state.holdUsed = false;
+  state.aiTarget = null;
+  if (state.aiEnabled) requestAIDecision();
+}
+
+function currentLegalPlacements() {
+  return enumeratePlacements(state.board, state.current.type);
+}
+
+function lockCurrentPiece() {
+  const p = state.current;
+  const afterLock = lockedBoard(state.board, p.type, p.rotation, p.row, p.col, SHAPES[p.type].color);
+  if (!afterLock) {
+    state.gameOver = true;
+    state.running = false;
+    return;
+  }
+  const { board: afterClear, cleared } = clearLines(afterLock);
+  state.board = afterClear;
+  if (cleared > 0) {
+    const points = [0, 100, 300, 500, 800][cleared] * state.level;
+    state.score += points;
+    state.lines += cleared;
+    state.level = 1 + Math.floor(state.lines / 10);
+    state.tickMs = Math.max(80, 350 - (state.level - 1) * 25);
+  }
+  spawnPiece();
+}
+
+function tryMove(dr, dc) {
+  const p = state.current;
+  if (fits(state.board, p.type, p.rotation, p.row + dr, p.col + dc)) {
+    p.row += dr;
+    p.col += dc;
+    return true;
+  }
+  return false;
+}
+
+function tryRotate() {
+  const p = state.current;
+  const nextRotation = (p.rotation + 1) % SHAPES[p.type].states.length;
+  const kicks = [[0, 0], [0, -1], [0, 1], [0, -2], [0, 2], [-1, 0]];
+  for (const [dr, dc] of kicks) {
+    if (fits(state.board, p.type, nextRotation, p.row + dr, p.col + dc)) {
+      p.rotation = nextRotation;
+      p.row += dr;
+      p.col += dc;
+      return true;
+    }
+  }
+  return false;
+}
+
+function hardDrop() {
+  while (tryMove(1, 0)) {}
+  lockCurrentPiece();
+}
+
+function holdPiece() {
+  if (state.holdUsed || !state.current) return;
+  state.holdUsed = true;
+  const currentType = state.current.type;
+  if (state.hold === null) {
+    state.hold = currentType;
+    spawnPiece();
+  } else {
+    const swapped = state.hold;
+    state.hold = currentType;
+    const rotation = 0;
+    const { minCol, maxCol } = colRangeFor(swapped, rotation);
+    state.current = { type: swapped, rotation, row: -2, col: Math.floor((minCol + maxCol) / 2) };
+    state.holdUsed = true;
+    state.aiTarget = null;
+  }
+}
+
+// ---------- AI networking ----------
+async function requestAIDecision() {
+  const placements = currentLegalPlacements();
+  if (placements.length === 0) return;
+
+  state.aiThinking = true;
+  setAIStatus("thinking", "Asking Jev…", null, null, null);
+
+  const payload = {
+    board: boardToAscii(state.board),
+    currentPiece: state.current.type,
+    holdPiece: state.hold,
+    nextPiece: state.queue[0] ?? null,
+    nextNextPiece: state.queue[1] ?? null,
+    score: state.score,
+    linesCleared: state.lines,
+    legalPlacements: placements.map(({ id, rotation, columns, linesCleared, holes, aggregateHeight, maxHeight, bumpiness }) => ({
+      id, rotation, columns, linesCleared, holes, aggregateHeight, maxHeight, bumpiness,
+    })),
+  };
+
+  const startedAt = performance.now();
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 4000);
+
+  let result = null;
+  let fallbackReason = null;
+  try {
+    const res = await fetch("/api/decide-placement", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+      signal: controller.signal,
+    });
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      throw new Error(`server responded ${res.status}${body.detail || body.error ? `: ${body.detail || body.error}` : ""}`);
+    }
+    result = await res.json();
+  } catch (err) {
+    fallbackReason = err.name === "AbortError" ? "request timed out after 4000 ms" : err.message;
+    result = null;
+  } finally {
+    clearTimeout(timeout);
+  }
+
+  state.aiThinking = false;
+  // The piece may have changed (e.g. game reset) while we were waiting.
+  if (!state.current) return;
+
+  const latencyMs = Math.round(performance.now() - startedAt);
+  let chosen = null;
+  let source = "heuristic";
+
+  if (result && result.chosenId) {
+    chosen = placements.find((p) => p.id === result.chosenId) || null;
+    if (!chosen) fallbackReason = `Jev returned unknown placement id "${result.chosenId}"`;
+  } else if (result && !fallbackReason) {
+    fallbackReason = "response had no chosenId";
+  }
+  if (chosen) {
+    source = "jev";
+    console.log(`[jev] piece ${state.current.type}: jev chose ${chosen.id} (confidence ${result.confidence}, ${latencyMs} ms)`);
+    setAIStatus("jev", describePlacement(chosen), result.confidence, result.probabilities, latencyMs, placements);
+  } else {
+    chosen = pickHeuristic(placements);
+    console.warn(`[jev] piece ${state.current.type}: HEURISTIC chose ${chosen.id} — ${fallbackReason}`);
+    reportFallback(state.current.type, chosen.id, fallbackReason);
+    setAIStatus("fallback", describePlacement(chosen) + " (local heuristic — Jev was unavailable)", null, null, latencyMs);
+  }
+
+  state.aiTarget = { rotation: chosen.rotation, col: chosen.col };
+}
+
+// Fire-and-forget: tells the server a heuristic move was used, so it shows up
+// in the terminal running server/app.py too (e.g. client-side timeouts, which
+// the server otherwise never sees).
+function reportFallback(piece, chosenId, reason) {
+  fetch("/api/log-fallback", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ piece, chosenId, reason }),
+  }).catch(() => {});
+}
+
+function describePlacement(p) {
+  const clearTxt = p.linesCleared > 0 ? `clears ${p.linesCleared} line(s)` : "clears no lines";
+  return `Rotation ${p.rotation}, columns ${p.columns.join(",")}: ${clearTxt}, ${p.holes} new hole(s), height ${p.maxHeight}.`;
+}
+
+function setAIStatus(kind, description, confidence, probabilities, latencyMs, placements) {
+  const badge = document.getElementById("aiSource");
+  const desc = document.getElementById("aiDescription");
+  const fill = document.getElementById("confidenceFill");
+  const confVal = document.getElementById("confidenceVal");
+  const probList = document.getElementById("probList");
+  const latencyVal = document.getElementById("latencyVal");
+
+  badge.className = "badge badge-" + (kind === "jev" ? "jev" : kind === "fallback" ? "fallback" : kind === "thinking" ? "idle" : "error");
+  badge.textContent = kind === "jev" ? "jev" : kind === "fallback" ? "heuristic fallback" : kind === "thinking" ? "thinking…" : "idle";
+  desc.textContent = description;
+
+  if (confidence == null) {
+    fill.style.width = "0%";
+    confVal.textContent = "–";
+  } else {
+    fill.style.width = Math.round(confidence * 100) + "%";
+    confVal.textContent = Math.round(confidence * 100) + "%";
+  }
+
+  probList.innerHTML = "";
+  if (probabilities && placements) {
+    const entries = Object.entries(probabilities).sort((a, b) => b[1] - a[1]).slice(0, 5);
+    const topProb = Math.max(...entries.map((e) => e[1]));
+    for (const [id, prob] of entries) {
+      const row = document.createElement("div");
+      row.className = "prob-item" + (prob === topProb ? " chosen" : "");
+      row.innerHTML = `<span>${id}</span><span class="prob-bar-track"><span class="prob-bar-fill" style="width:${Math.round(prob * 100)}%"></span></span><span>${Math.round(prob * 100)}%</span>`;
+      probList.appendChild(row);
+    }
+  }
+
+  latencyVal.textContent = latencyMs == null ? "–" : `${latencyMs} ms`;
+}
+
+// ---------- AI execution (animates the piece toward the chosen placement) ----------
+function stepAIExecution() {
+  const p = state.current;
+  const target = state.aiTarget;
+  if (!target) return false; // still waiting on the network response
+
+  if (p.rotation !== target.rotation) {
+    if (!tryRotate()) {
+      // Should not normally happen since the target came from a legality
+      // check against this exact board; bail out to a hard drop to avoid
+      // getting stuck.
+      hardDrop();
+    }
+    return true;
+  }
+  if (p.col < target.col) { tryMove(0, 1); return true; }
+  if (p.col > target.col) { tryMove(0, -1); return true; }
+  hardDrop();
+  return true;
+}
+
+// ---------- rendering ----------
+const canvas = document.getElementById("board");
+const ctx = canvas.getContext("2d");
+const CELL = canvas.width / COLS;
+
+function drawCell(context, x, y, size, color) {
+  context.fillStyle = color;
+  context.fillRect(x + 1, y + 1, size - 2, size - 2);
+  context.strokeStyle = "rgba(255,255,255,0.18)";
+  context.strokeRect(x + 1, y + 1, size - 2, size - 2);
+}
+
+function render() {
+  ctx.fillStyle = "#0b0e1a";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // faint playfield grid
+  ctx.strokeStyle = "rgba(255,255,255,0.045)";
+  ctx.lineWidth = 1;
+  for (let c = 1; c < COLS; c++) {
+    ctx.beginPath();
+    ctx.moveTo(c * CELL, 0);
+    ctx.lineTo(c * CELL, canvas.height);
+    ctx.stroke();
+  }
+  for (let r = 1; r < ROWS; r++) {
+    ctx.beginPath();
+    ctx.moveTo(0, r * CELL);
+    ctx.lineTo(canvas.width, r * CELL);
+    ctx.stroke();
+  }
+
+  // settled blocks
+  for (let r = 0; r < ROWS; r++) {
+    for (let c = 0; c < COLS; c++) {
+      if (state.board[r][c]) drawCell(ctx, c * CELL, r * CELL, CELL, state.board[r][c]);
+    }
+  }
+
+  // ghost piece (where it will land)
+  if (state.current) {
+    const p = state.current;
+    const ghostRow = dropRow(state.board, p.type, p.rotation, p.col) ?? p.row;
+    ctx.globalAlpha = 0.22;
+    for (const [dr, dc] of cellsFor(p.type, p.rotation)) {
+      const r = ghostRow + dr, c = p.col + dc;
+      if (r >= 0) drawCell(ctx, c * CELL, r * CELL, CELL, SHAPES[p.type].color);
+    }
+    ctx.globalAlpha = 1;
+
+    // active piece
+    for (const [dr, dc] of cellsFor(p.type, p.rotation)) {
+      const r = p.row + dr, c = p.col + dc;
+      if (r >= 0) drawCell(ctx, c * CELL, r * CELL, CELL, SHAPES[p.type].color);
+    }
+  }
+
+  if (state.gameOver) {
+    ctx.fillStyle = "rgba(11,14,26,0.8)";
+    ctx.fillRect(0, canvas.height / 2 - 30, canvas.width, 60);
+    ctx.fillStyle = "#fff";
+    ctx.font = "bold 20px -apple-system, sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText("Game over", canvas.width / 2, canvas.height / 2 + 7);
+  }
+
+  renderPreview("nextCanvas", state.queue[0]);
+  renderPreview("holdCanvas", state.hold);
+
+  document.getElementById("scoreVal").textContent = state.score;
+  document.getElementById("linesVal").textContent = state.lines;
+  document.getElementById("levelVal").textContent = state.level;
+}
+
+function renderPreview(canvasId, type) {
+  const c = document.getElementById(canvasId);
+  const g = c.getContext("2d");
+  g.fillStyle = "#f9fafb";
+  g.fillRect(0, 0, c.width, c.height);
+  if (!type) return;
+  const cells = cellsFor(type, 0);
+  const size = 20;
+  const xs = cells.map((cc) => cc[1]), ys = cells.map((cc) => cc[0]);
+  const offX = (c.width - (Math.max(...xs) - Math.min(...xs) + 1) * size) / 2 - Math.min(...xs) * size;
+  const offY = (c.height - (Math.max(...ys) - Math.min(...ys) + 1) * size) / 2 - Math.min(...ys) * size;
+  for (const [dr, dc] of cells) {
+    drawCell(g, offX + dc * size, offY + dr * size, size, SHAPES[type].color);
+  }
+}
+
+// ---------- game loop ----------
+function loop(timestamp) {
+  if (state.running && !state.gameOver) {
+    const delta = timestamp - state.lastTime;
+    state.accumulator += delta;
+    while (state.accumulator >= state.tickMs) {
+      tick();
+      state.accumulator -= state.tickMs;
+    }
+  }
+  state.lastTime = timestamp;
+  render();
+  requestAnimationFrame(loop);
+}
+
+function tick() {
+  if (!state.current) { spawnPiece(); return; }
+
+  if (state.aiEnabled) {
+    if (!state.aiTarget && !state.aiThinking) requestAIDecision();
+    if (state.aiTarget) stepAIExecution();
+    return;
+  }
+
+  if (!tryMove(1, 0)) lockCurrentPiece();
+}
+
+// ---------- input (manual mode) ----------
+window.addEventListener("keydown", (e) => {
+  if (!state.running || state.gameOver || state.aiEnabled || !state.current) return;
+  switch (e.key) {
+    case "ArrowLeft": tryMove(0, -1); break;
+    case "ArrowRight": tryMove(0, 1); break;
+    case "ArrowDown": if (!tryMove(1, 0)) lockCurrentPiece(); break;
+    case "ArrowUp":
+    case "x":
+    case "z": tryRotate(); break;
+    case " ": e.preventDefault(); hardDrop(); break;
+    case "c": holdPiece(); break;
+  }
+});
+
+// ---------- controls ----------
+document.getElementById("startBtn").addEventListener("click", () => {
+  if (state.gameOver) resetGame();
+  state.running = true;
+  if (!state.current) spawnPiece();
+});
+document.getElementById("pauseBtn").addEventListener("click", () => { state.running = false; });
+document.getElementById("resetBtn").addEventListener("click", () => resetGame());
+
+document.getElementById("aiToggle").addEventListener("change", (e) => {
+  state.aiEnabled = e.target.checked;
+  state.aiTarget = null;
+  if (state.aiEnabled && state.current) requestAIDecision();
+});
+
+document.getElementById("speedSlider").addEventListener("input", (e) => {
+  state.tickMs = Number(e.target.value);
+});
+
+function resetGame() {
+  state.board = emptyBoard();
+  state.bag = [];
+  state.queue = [];
+  state.current = null;
+  state.hold = null;
+  state.holdUsed = false;
+  state.score = 0;
+  state.lines = 0;
+  state.level = 1;
+  state.gameOver = false;
+  state.aiTarget = null;
+  state.tickMs = Number(document.getElementById("speedSlider").value);
+  state.running = true;
+  setAIStatus("idle", "Waiting for the first piece…", null, null, null);
+  spawnPiece();
+}
+
+// kick things off
+resetGame();
+state.running = false; // wait for Start
+requestAnimationFrame(loop);
+  </script>
+</body>
+</html>

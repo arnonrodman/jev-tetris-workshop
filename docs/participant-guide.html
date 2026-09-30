@@ -1,0 +1,538 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jev Tetris Participant Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    --bg: #f2f4f7;
+    --surface: #ffffff;
+    --surface-2: #e8ecf2;
+    --ink: #151c28;
+    --muted: #586476;
+    --line: #d5dbe4;
+    --accent: #0b7a84;
+    --accent-ink: #ffffff;
+    --accent-soft: #dcf0f1;
+    --amber: #9a5c00;
+    --amber-soft: #fbeed6;
+    --done: #2f8a4c;
+    --done-soft: #e1f3e6;
+    --code-bg: #eef1f5;
+    --font-display: "Chakra Petch", "Trebuchet MS", system-ui, sans-serif;
+    --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg: #0e131b;
+      --surface: #161d29;
+      --surface-2: #1d2635;
+      --ink: #e4e9f1;
+      --muted: #97a3b5;
+      --line: #2a3446;
+      --accent: #4cc3cc;
+      --accent-ink: #0b1a1d;
+      --accent-soft: #143238;
+      --amber: #f0ad4a;
+      --amber-soft: #33270f;
+      --done: #5fcf85;
+      --done-soft: #15301f;
+      --code-bg: #121925;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #0e131b;
+    --surface: #161d29;
+    --surface-2: #1d2635;
+    --ink: #e4e9f1;
+    --muted: #97a3b5;
+    --line: #2a3446;
+    --accent: #4cc3cc;
+    --accent-ink: #0b1a1d;
+    --accent-soft: #143238;
+    --amber: #f0ad4a;
+    --amber-soft: #33270f;
+    --done: #5fcf85;
+    --done-soft: #15301f;
+    --code-bg: #121925;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.6;
+    padding-inline: 20px;
+    padding-block: 0 72px;
+  }
+  .wrap { max-width: 860px; margin: 0 auto; display: flex; flex-direction: column; gap: 40px; }
+  h1, h2, h3 { font-family: var(--font-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+  h1 { font-size: clamp(2rem, 5.5vw, 3rem); font-weight: 700; }
+  h2 { font-size: 1.6rem; font-weight: 600; }
+  h3 { font-size: 1.1rem; font-weight: 600; }
+  p { margin: 0; max-width: 68ch; }
+  a { color: var(--accent); }
+  code { font-family: var(--font-mono); font-size: 0.88em; background: var(--code-bg); padding: 0.1em 0.35em; border-radius: 4px; }
+  .eyebrow { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); }
+  .muted { color: var(--muted); }
+  button { font: inherit; cursor: pointer; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  /* header */
+  header.top { padding-block: 48px 0; display: flex; flex-direction: column; gap: 16px; }
+  .lede { font-size: 1.1rem; color: var(--muted); }
+  .you { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; }
+  .you label { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+  .you input { font: inherit; font-size: 15px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--ink); width: min(260px, 100%); }
+
+  /* sticky progress */
+  .progress {
+    position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5;
+    background: var(--bg); padding-block: 12px; border-bottom: 1px solid var(--line);
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .progress-row { display: flex; align-items: center; gap: 14px; }
+  .progress-label { font-family: var(--font-mono); font-size: 13px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .progress-label b { font-weight: 500; }
+  .track { flex: 1; height: 8px; background: var(--surface-2); border-radius: 4px; overflow: hidden; }
+  .fill { height: 100%; width: 0; background: var(--accent); transition: width .25s ease; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip { font-family: var(--font-mono); font-size: 12px; padding: 3px 10px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--muted); text-decoration: none; white-space: nowrap; }
+  .chip.complete { background: var(--done-soft); border-color: transparent; color: var(--done); }
+  @media (prefers-reduced-motion: reduce) { .fill { transition: none; } }
+
+  /* parts */
+  .part { display: flex; flex-direction: column; gap: 14px; scroll-margin-top: 110px; }
+  .part-head { display: flex; flex-direction: column; gap: 4px; }
+  .steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+
+  .step { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; display: grid; grid-template-columns: 30px 1fr; gap: 4px 14px; }
+  .step.is-done { border-color: var(--done); }
+  .check { grid-row: 1 / span 2; width: 26px; height: 26px; margin-top: 1px; border-radius: 7px; border: 2px solid var(--line); background: var(--surface); display: grid; place-items: center; color: transparent; padding: 0; }
+  .check:hover { border-color: var(--accent); }
+  .step.is-done .check { background: var(--done); border-color: var(--done); color: var(--surface); }
+  .check svg { width: 14px; height: 14px; }
+  .step-title { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+  .step-num { font-family: var(--font-mono); font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .step.is-done h3 { color: var(--muted); }
+  .step-body { grid-column: 2; display: flex; flex-direction: column; gap: 10px; font-size: 15px; line-height: 1.55; min-width: 0; }
+  .step-body ol, .step-body ul { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 4px; }
+
+  .code { position: relative; }
+  .code pre { margin: 0; font-family: var(--font-mono); font-size: 13px; line-height: 1.55; background: var(--code-bg); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; padding-right: 64px; overflow-x: auto; }
+  .code .file { font-family: var(--font-mono); font-size: 11.5px; color: var(--muted); margin-bottom: 4px; display: block; }
+  .copy { position: absolute; right: 8px; bottom: 8px; font-family: var(--font-mono); font-size: 11.5px; padding: 3px 8px; border-radius: 5px; border: 1px solid var(--line); background: var(--surface); color: var(--muted); }
+  .copy:hover { color: var(--accent); border-color: var(--accent); }
+
+  .done-when { font-size: 14px; background: var(--done-soft); color: var(--ink); border-radius: 8px; padding: 8px 12px; }
+  .done-when b { color: var(--done); font-weight: 600; }
+  .tip { font-size: 14px; background: var(--amber-soft); border-radius: 8px; padding: 8px 12px; }
+  .tip b { color: var(--amber); font-weight: 600; }
+
+  .notes { display: flex; flex-direction: column; gap: 4px; }
+  .notes label { font-family: var(--font-mono); font-size: 11.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+  .notes textarea { font: inherit; font-size: 14px; min-height: 60px; resize: vertical; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--ink); width: 100%; }
+
+  .ex-goal { font-size: 15px; color: var(--muted); }
+
+  /* wrap-up */
+  .share { background: var(--accent-soft); border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+  .share ul { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 4px; }
+  .summary { font-family: var(--font-mono); font-size: 13px; white-space: pre-wrap; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; margin: 0; overflow-x: auto; }
+  .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .btn { font-size: 14px; padding: 8px 14px; border-radius: 8px; border: 1px solid var(--accent); background: var(--accent); color: var(--accent-ink); font-weight: 500; }
+  .btn.ghost { background: transparent; color: var(--muted); border-color: var(--line); }
+  .btn.danger { background: transparent; color: var(--amber); border-color: var(--amber); }
+  .status { font-size: 13px; color: var(--muted); }
+
+  footer { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 18px; }
+
+  @media (max-width: 520px) {
+    .step { grid-template-columns: 26px 1fr; gap: 4px 10px; padding: 14px; }
+    .check { width: 24px; height: 24px; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="top">
+    <span class="eyebrow">Participant guide · Jev Tetris Workshop</span>
+    <h1>Your workshop steps</h1>
+    <p class="lede">Work through these in order: set up the game, watch Jev play, then change how it decides and measure the result. Tick each step as you finish it. Your ticks and notes are saved in this browser only.</p>
+    <div class="you">
+      <label for="participantName">Your name</label>
+      <input id="participantName" type="text" placeholder="e.g. Dana" autocomplete="name">
+    </div>
+  </header>
+
+  <nav class="progress" aria-label="Progress">
+    <div class="progress-row">
+      <span class="progress-label"><b id="doneCount">0</b> of <b id="totalCount">0</b> steps</span>
+      <div class="track" aria-hidden="true"><div class="fill" id="progressFill"></div></div>
+    </div>
+    <div class="chips" id="chips"></div>
+  </nav>
+
+  <!-- PART A -->
+  <section class="part" id="setup" data-part="Setup">
+    <div class="part-head">
+      <span class="eyebrow">Part A</span>
+      <h2>Set up and run the game</h2>
+    </div>
+    <ol class="steps">
+      <li class="step" data-step="a1">
+        <button class="check" aria-label="Mark step done"></button>
+        <div class="step-title"><span class="step-num">A1</span><h3>Check you have what you need</h3></div>
+        <div class="step-body">
+          <ul>
+            <li>Python 3.10 or newer. Check with <code>python3 --version</code>.</li>
+            <li>A TypeSafe API key from <a href="https://console.typesafe.ai/keys">console.typesafe.ai/keys</a>. No key yet? You can still do Part A and B, and the game will use the built-in heuristic bot instead of Jev.</li>
+            <li>The <code>jev-tetris-workshop</code> folder on your machine, opened in a terminal or in PyCharm.</li>
+          </ul>
+        </div>
+      </li>
+      <li class="step" data-step="a2">
+        <button class="check" aria-label="Mark step done"></button>
+        <div class="step-title"><span class="step-num">A2</span><h3>Create a virtual environment and install</h3></div>
+        <div class="step-body">
+          <div class="code"><pre><code>python3 -m venv venv
+source venv/bin/activate      # Windows: venv\Scripts\activate
+pip install -r requirements.txt</code></pre><button class="copy">Copy</button></div>
+          <p class="muted" style="font-size:14px">In PyCharm: Settings → Python Interpreter → Add Local Interpreter → Virtualenv → New, then run <code>pip install -r requirements.txt</code> in PyCharm's Terminal tab.</p>
+        </div>
+      </li>
+      <li class="step" data-step="a3">
+        <button class="check" aria-label="Mark step done"></button>
+        <div class="step-title"><span class="step-num">A3</span><h3>Add your API key</h3></div>
+        <div class="step-body">
+          <div class="code"><pre><code>cp .env.example .env</code></pre><button class="copy">Copy</button></div>
+          <p>Open <code>.env</code> and paste your key after <code>TYPESAFE_API_KEY=</code>. The file must be named exactly <code>.env</code>. It's already in <code>.gitignore</code>, so the key won't be committed.</p>
+        </div>
+      </li>
+      <li class="step" data-step="a4">
+        <button class="check" aria-label="Mark step done"></button>
+        <div class="step-title"><span class="step-num">A4</span><h3>Start the server</h3></div>
+        <div class="step-body">
+          <div class="code"><pre><code>python server/app.py</code></pre><button class="copy">Copy</button></div>
+          <p>Wait for <code>Running on http://127.0.0.1:3000</code>. If you see <code>⚠️ TYPESAFE_API_KEY is not set</code>, go back to A3. In PyCharm, right-click <code>server/app.py</code> → Run 'app'.</p>
+          <p class="muted" style="font-size:14px">Keep this terminal visible. The server logs every decision here, and it reloads by itself when you save <code>app.py</code>.</p>
+        </div>
+      </li>
+      <li class="step" data-step="a5">
+        <button class="check" aria-label="Mark step done"></button>
+        <div class="step-title"><span class="step-num">A5</span><h3>Check the server can see your key</h3></div>
+        <div class="step-body">
+          <p>Open <a href="http://localhost:3000/api/health">localhost:3000/api/health</a> in your browser, or run:</p>
+          <div class="code"><pre><code>curl localhost:3000/api/health</code></pre><button class="copy">Copy</button></div>
+          <div class="done-when"><b>Done when</b> you see <code>"hasApiKey": true</code>.</div>
+        </div>
+      </li>
+      <li class="step" data-step="a6">
+        <button class="check" aria-label="Mark step done"></button>
+        <div class="step-title"><span class="step-num">A6</span><h3>Start a game and find the logs</h3></div>
+        <div class="step-body">
+          <ol>
+            <li>Open <a href="http://localhost:3000">localhost:3000</a> and press <b>Start</b>.</li>
+            <li>Open the browser's DevTools console (⌥⌘J on Mac, Ctrl+Shift+J on Windows).</li>
+          </ol>
+          <p>Each piece logs one line, in the console and in the server terminal:</p>
+          <div class="code"><pre><code>[jev] piece T: jev chose p33 (confidence 0.87, 276 ms)
+[jev] piece S: HEURISTIC chose p4 — request timed out after 4000 ms</code></pre></div>
+          <div class="done-when"><b>Done when</b> the badge in "Jev's decision" says <b>jev</b> and you see <code>jev chose</code> lines.</div>
+          <div class="tip"><b>Seeing only HEURISTIC?</b> The text after the dash tells you why. A <code>401</code> means the key is wrong or your access isn't active yet. A timeout usually means a VPN or proxy is blocking <code>api.typesafe.ai</code>.</div>
+        </div>
+      </li>
+    </ol>
+  </section>
+
+  <!-- PART B -->
+  <section class="part" id="explore" data-part="Explore">
+    <div class="part-head">
+      <span class="eyebrow">Part B</span>
+      <h2>Watch how Jev decides</h2>
+    </div>
+    <ol class="steps">
+      <li class="step" data-step="b1">
+        <button class="check" aria-label="Mark step done"></button>
+        <div class="step-title"><span class="step-num">B1</span><h3>Watch 20 pieces</h3></div>
+        <div class="step-body">
+          <p>For each piece, look at the "Jev's decision" card: the placement it chose, the confidence bar, the top five probabilities and the latency. Use the speed slider to slow it down.</p>
+          <p>Look for boards where confidence drops. Are there several placements that look about equally good?</p>
+          <div class="notes"><label for="note-b1">Lowest and highest confidence you saw, and what the board looked like</label><textarea id="note-b1" data-note="b1"></textarea></div>
+        </div>
+      </li>
+      <li class="step" data-step="b2">
+        <button class="check" aria-label="Mark step done"></button>
+        <div class="step-title"><span class="step-num">B2</span><h3>Play a few pieces yourself</h3></div>
+        <div class="step-body">
+          <p>Turn off the <b>AI (Jev) control</b> toggle and play. Controls: <code>←</code> <code>→</code> move, <code>↓</code> soft drop, <code>↑</code>/<code>Z</code>/<code>X</code> rotate, <code>Space</code> hard drop, <code>C</code> hold. Turn the toggle back on when you're done.</p>
+        </div>
+      </li>
+    </ol>
+  </section>
+
+  <!-- PART C -->
+  <section class="part" id="exercises" data-part="Exercises">
+    <div class="part-head">
+      <span class="eyebrow">Part C</span>
+      <h2>Exercises</h2>
+      <p class="muted">Each one builds on the last. The code snippets are starting points; fit them into the existing functions.</p>
+    </div>
+    <ol class="steps">
+
+      <li class="step" data-step="c1">
+        <button class="check" aria-label="Mark step done"></button>
+        <div class="step-title"><span class="step-num">C1</span><h3>Only trust Jev when it's confident</h3></div>
+        <div class="step-body">
+          <p class="ex-goal">When Jev's confidence is below 0.3, use the heuristic's pick instead.</p>
+          <ol>
+            <li>In <code>server/app.py</code>, add a flag to the JSON returned by <code>decide_placement</code>.</li>
+            <li>In <code>public/index.html</code>, in <code>requestAIDecision</code>, drop Jev's pick when the flag is set, just before the <code>if (chosen)</code> line.</li>
+          </ol>
+          <div class="code"><span class="file">server/app.py</span><pre><code>"lowConfidence": answer.confidence &lt; 0.3,</code></pre><button class="copy">Copy</button></div>
+          <div class="code"><span class="file">public/index.html</span><pre><code>if (chosen &amp;&amp; result.lowConfidence) {
+  fallbackReason = `low confidence ${result.confidence}`;
+  chosen = null;
+}</code></pre><button class="copy">Copy</button></div>
+          <div class="done-when"><b>Done when</b> some pieces log <code>HEURISTIC chose … — low confidence 0.2…</code>.</div>
+          <div class="notes"><label for="note-c1">How often did the gate fire? Did the game get better or worse?</label><textarea id="note-c1" data-note="c1"></textarea></div>
+        </div>
+      </li>
+
+      <li class="step" data-step="c2">
+        <button class="check" aria-label="Mark step done"></button>
+        <div class="step-title"><span class="step-num">C2</span><h3>Ask a yes/no question about Hold</h3></div>
+        <div class="step-body">
+          <p class="ex-goal">Add a <code>Noul</code> question to the same request, and hold the piece when Jev says yes.</p>
+          <div class="code"><span class="file">server/app.py</span><pre><code>from typesafe_sdk import Choice, Noul, TypeSafeClient
+
+questions={
+    "placement": Choice(...),   # unchanged
+    "hold": Noul(instructions=(
+        "Would holding the current piece and playing the next one "
+        "instead lead to a better outcome?"
+    )),
+},
+
+# in the returned JSON — .noul is the probability of "yes", 0 to 1
+"holdProbability": response.answers["hold"].noul,</code></pre><button class="copy">Copy</button></div>
+          <div class="code"><span class="file">public/index.html · requestAIDecision, after the result arrives</span><pre><code>if (result?.holdProbability &gt; 0.8 &amp;&amp; !state.holdUsed) {
+  console.log(`[jev] holding ${state.current.type} (p=${result.holdProbability})`);
+  holdPiece();   // the next tick asks Jev about the swapped piece
+  return;
+}</code></pre><button class="copy">Copy</button></div>
+          <div class="tip"><b>Tip:</b> the held-piece slot in the UI should start filling up. Make sure the game still runs with no API key, since <code>result</code> is <code>null</code> then.</div>
+          <div class="done-when"><b>Done when</b> you see <code>holding …</code> lines and the piece in the hold box changes during play.</div>
+          <div class="notes"><label for="note-c2">When did Jev choose to hold?</label><textarea id="note-c2" data-note="c2"></textarea></div>
+        </div>
+      </li>
+
+      <li class="step" data-step="c3">
+        <button class="check" aria-label="Mark step done"></button>
+        <div class="step-title"><span class="step-num">C3</span><h3>Ask Jev to score the board</h3></div>
+        <div class="step-body">
+          <p class="ex-goal">Add a <code>Score</code> question that rates the board, log it, and compare it with the heuristic.</p>
+          <p><code>Score</code> takes an ordered list of levels. The first item describes score 0, the next score 1, and so on. The answer has <code>.score</code> (a probability-weighted average, so it can fall between levels) and <code>.confidence</code>.</p>
+          <div class="code"><span class="file">server/app.py</span><pre><code>from typesafe_sdk import Choice, Noul, Score, TypeSafeClient
+
+# add to questions={...}
+"board_health": Score(
+    instructions="Rate how healthy this board's surface is",
+    criteria=[
+        "Very unhealthy: tall stack, many holes, near top-out",
+        "Poor: several holes or a very uneven surface",
+        "Okay: a few bumps or one hole",
+        "Healthy: low, flat, no holes",
+    ],
+),
+
+# after the call returns
+health = response.answers["board_health"]
+app.logger.info("[jev] board health %.2f (confidence %.2f)", health.score, health.confidence)</code></pre><button class="copy">Copy</button></div>
+          <div class="tip"><b>Note:</b> the board sent with each request is the result of the previous placement, so this rates the board Jev's last move left behind.</div>
+          <div class="done-when"><b>Done when</b> each piece logs a board health line and you can say whether it agrees with how the board looks.</div>
+          <div class="notes"><label for="note-c3">Did Jev's health score match your own judgment? Where did it disagree?</label><textarea id="note-c3" data-note="c3"></textarea></div>
+        </div>
+      </li>
+
+      <li class="step" data-step="c4">
+        <button class="check" aria-label="Mark step done"></button>
+        <div class="step-title"><span class="step-num">C4</span><h3>Change the instructions, not the code</h3></div>
+        <div class="step-body">
+          <p class="ex-goal">Change how Jev plays by editing only the <code>instructions</code> text in <code>Choice(...)</code>.</p>
+          <p>Try one of these, save, and watch a game. The server reloads on save.</p>
+          <ul>
+            <li>"Aggressively prioritize clearing multiple lines at once, even if it means a taller stack."</li>
+            <li>"Keep column 9 empty so an I piece can clear four lines at once."</li>
+            <li>"Play as safely as possible: never let any column get above height 6."</li>
+          </ul>
+          <div class="done-when"><b>Done when</b> you can point to a visible change in how the stack is built.</div>
+          <div class="notes"><label for="note-c4">Which instruction did you try, and what changed?</label><textarea id="note-c4" data-note="c4"></textarea></div>
+        </div>
+      </li>
+
+      <li class="step" data-step="c5">
+        <button class="check" aria-label="Mark step done"></button>
+        <div class="step-title"><span class="step-num">C5</span><h3>Measure how often Jev agrees with the heuristic</h3></div>
+        <div class="step-body">
+          <p class="ex-goal">Play one full game and compute the percentage of pieces where Jev and the heuristic picked the same placement.</p>
+          <div class="code"><span class="file">public/index.html · near the top of the script</span><pre><code>const agreement = { same: 0, total: 0 };</code></pre><button class="copy">Copy</button></div>
+          <div class="code"><span class="file">public/index.html · requestAIDecision, inside if (chosen)</span><pre><code>const h = pickHeuristic(placements);
+agreement.total++;
+if (h.id === chosen.id) agreement.same++;
+console.log(`[agree] ${agreement.same}/${agreement.total} = ` +
+  `${Math.round(100 * agreement.same / agreement.total)}%`);</code></pre><button class="copy">Copy</button></div>
+          <div class="tip"><b>Tip:</b> undo the C1 confidence gate for this run, or the low-confidence pieces won't be counted.</div>
+          <div class="done-when"><b>Done when</b> you have one agreement percentage for a full game.</div>
+          <div class="notes"><label for="note-c5">Agreement percentage, pieces played, final score</label><textarea id="note-c5" data-note="c5"></textarea></div>
+        </div>
+      </li>
+    </ol>
+  </section>
+
+  <!-- WRAP UP -->
+  <section class="part" id="share" data-part="Share">
+    <div class="part-head">
+      <span class="eyebrow">Wrap-up</span>
+      <h2>Bring back to the group</h2>
+    </div>
+    <div class="share">
+      <ul>
+        <li>Your agreement percentage from C5, and how many pieces it covered.</li>
+        <li>One board where Jev was unsure, and whether you would have been unsure too.</li>
+        <li>The instruction change from C4 that had the biggest effect.</li>
+        <li>Whether you'd trust Jev for this decision in production, and at what confidence threshold.</li>
+      </ul>
+      <p style="font-size:14.5px">This collects your notes into one block you can paste into the group chat:</p>
+      <pre class="summary" id="summary"></pre>
+      <div class="row">
+        <button class="btn" id="copySummary">Copy my summary</button>
+        <span class="status" id="summaryStatus" role="status"></span>
+      </div>
+    </div>
+    <div class="row">
+      <button class="btn ghost" id="resetBtn">Clear my progress</button>
+      <span id="resetConfirm" hidden class="row">
+        <span class="status">Clear all ticks and notes in this browser?</span>
+        <button class="btn danger" id="resetYes">Clear</button>
+        <button class="btn ghost" id="resetNo">Keep</button>
+      </span>
+    </div>
+  </section>
+
+  <footer>Based on the workshop's README.md, PROMPT.md and source code. Code snippets use the field names from the installed <code>typesafe-sdk</code>: <code>.choice</code>, <code>.confidence</code>, <code>.probabilities</code> for Choice, <code>.noul</code> for Noul, and <code>.score</code> for Score.</footer>
+</div>
+
+<script>
+(function () {
+  const KEY = "jev-workshop-participant-v1";
+  const CHECK_SVG = '<svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5l3.2 3L13 4.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+  let data = { name: "", done: {}, notes: {} };
+  try { const raw = localStorage.getItem(KEY); if (raw) data = Object.assign(data, JSON.parse(raw)); } catch (e) {}
+  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(data)); } catch (e) {} };
+
+  const steps = [...document.querySelectorAll(".step")];
+  const parts = [...document.querySelectorAll(".part[data-part]")].filter((p) => p.querySelector(".step"));
+  document.getElementById("totalCount").textContent = steps.length;
+
+  const chips = document.getElementById("chips");
+  parts.forEach((p) => {
+    const a = document.createElement("a");
+    a.className = "chip"; a.href = "#" + p.id; a.dataset.part = p.id;
+    chips.appendChild(a);
+  });
+
+  function render() {
+    steps.forEach((s) => {
+      const on = !!data.done[s.dataset.step];
+      s.classList.toggle("is-done", on);
+      const btn = s.querySelector(".check");
+      btn.innerHTML = CHECK_SVG;
+      btn.setAttribute("aria-pressed", on ? "true" : "false");
+      btn.setAttribute("aria-label", (on ? "Mark not done: " : "Mark done: ") + s.querySelector("h3").textContent);
+    });
+    const done = steps.filter((s) => data.done[s.dataset.step]).length;
+    document.getElementById("doneCount").textContent = done;
+    document.getElementById("progressFill").style.width = (100 * done / steps.length) + "%";
+    parts.forEach((p) => {
+      const ps = [...p.querySelectorAll(".step")];
+      const d = ps.filter((s) => data.done[s.dataset.step]).length;
+      const chip = chips.querySelector(`[data-part="${p.id}"]`);
+      chip.textContent = `${p.dataset.part} ${d}/${ps.length}`;
+      chip.classList.toggle("complete", d === ps.length);
+    });
+    renderSummary();
+  }
+
+  function renderSummary() {
+    const lines = [`Jev Tetris workshop — ${data.name || "(your name)"}`];
+    const done = steps.filter((s) => data.done[s.dataset.step]).length;
+    lines.push(`Progress: ${done}/${steps.length} steps`);
+    document.querySelectorAll("textarea[data-note]").forEach((t) => {
+      const v = (data.notes[t.dataset.note] || "").trim();
+      if (v) lines.push(`${t.dataset.note.toUpperCase()} · ${t.previousElementSibling.textContent}:\n  ${v.replace(/\n/g, "\n  ")}`);
+    });
+    if (lines.length === 2) lines.push("(Your notes from B1 and C1–C5 will appear here.)");
+    document.getElementById("summary").textContent = lines.join("\n");
+  }
+
+  steps.forEach((s) => s.querySelector(".check").addEventListener("click", () => {
+    const k = s.dataset.step; data.done[k] = !data.done[k]; save(); render();
+  }));
+
+  const nameEl = document.getElementById("participantName");
+  nameEl.value = data.name || "";
+  nameEl.addEventListener("input", () => { data.name = nameEl.value; save(); renderSummary(); });
+
+  document.querySelectorAll("textarea[data-note]").forEach((t) => {
+    t.value = data.notes[t.dataset.note] || "";
+    t.addEventListener("input", () => { data.notes[t.dataset.note] = t.value; save(); renderSummary(); });
+  });
+
+  async function copyText(text, onOk, onFail) {
+    try { await navigator.clipboard.writeText(text); onOk(); } catch (e) { onFail(); }
+  }
+  function selectNode(node) {
+    const r = document.createRange(); r.selectNodeContents(node);
+    const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r);
+  }
+
+  document.querySelectorAll(".code .copy").forEach((b) => b.addEventListener("click", () => {
+    const pre = b.parentElement.querySelector("pre");
+    copyText(pre.innerText,
+      () => { b.textContent = "Copied"; setTimeout(() => (b.textContent = "Copy"), 1400); },
+      () => { selectNode(pre); b.textContent = "Press ⌘C"; setTimeout(() => (b.textContent = "Copy"), 2000); });
+  }));
+
+  const status = document.getElementById("summaryStatus");
+  document.getElementById("copySummary").addEventListener("click", () => {
+    const pre = document.getElementById("summary");
+    copyText(pre.textContent,
+      () => { status.textContent = "Copied to clipboard"; },
+      () => { selectNode(pre); status.textContent = "Selected. Press ⌘C or Ctrl+C to copy."; });
+  });
+
+  const confirmEl = document.getElementById("resetConfirm");
+  document.getElementById("resetBtn").addEventListener("click", () => { confirmEl.hidden = false; });
+  document.getElementById("resetNo").addEventListener("click", () => { confirmEl.hidden = true; });
+  document.getElementById("resetYes").addEventListener("click", () => {
+    data = { name: data.name, done: {}, notes: {} }; save();
+    document.querySelectorAll("textarea[data-note]").forEach((t) => (t.value = ""));
+    confirmEl.hidden = true; render();
+  });
+
+  render();
+})();
+</script>
+
+</html>

@@ -1,0 +1,3 @@
+{
+  "_deprecated": "This project's server is now Python (Flask) — see server/app.py, requirements.txt, and README.md. This file is unused and safe to delete."
+}

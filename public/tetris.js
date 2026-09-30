@@ -1,0 +1,4 @@
+// Deprecated: this file's contents are now inlined directly inside
+// public/index.html's <script> tag, per the "one page" requirement.
+// Kept only so nothing silently disappears from an earlier download;
+// it is not referenced by index.html anymore and is safe to delete.
