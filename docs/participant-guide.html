@@ -167,7 +167,7 @@
   <header class="top">
     <span class="eyebrow">Participant guide · Jev Tetris Workshop</span>
     <h1>Your workshop steps</h1>
-    <p class="lede">Work through these in order: set up the game, watch Jev play, then change how it decides and measure the result. Tick each step as you finish it. Your ticks and notes are saved in this browser only.</p>
+    <p class="lede">Work through these in order: clone the repo, set up the game, watch Jev play, then change how it decides and measure the result. Tick each step as you finish it. Your ticks and notes are saved in this browser only.</p>
     <div class="you">
       <label for="participantName">Your name</label>
       <input id="participantName" type="text" placeholder="e.g. Dana" autocomplete="name">
@@ -189,20 +189,31 @@
       <h2>Set up and run the game</h2>
     </div>
     <ol class="steps">
+      <li class="step" data-step="a0">
+        <button class="check" aria-label="Mark step done"></button>
+        <div class="step-title"><span class="step-num">A1</span><h3>Clone the workshop repo</h3></div>
+        <div class="step-body">
+          <p>The code is on GitHub at <a href="https://github.com/arnonrodman/jev-tetris-workshop">github.com/arnonrodman/jev-tetris-workshop</a>. You need Git installed. Check with <code>git --version</code>.</p>
+          <div class="code"><pre><code>git clone https://github.com/arnonrodman/jev-tetris-workshop.git
+cd jev-tetris-workshop</code></pre><button class="copy">Copy</button></div>
+          <p class="muted" style="font-size:14px">In PyCharm: File → New → Project from Version Control, paste the URL above, and click Clone.</p>
+          <div class="done-when"><b>Done when</b> the folder has <code>server/app.py</code>, <code>public/index.html</code> and <code>requirements.txt</code>.</div>
+        </div>
+      </li>
       <li class="step" data-step="a1">
         <button class="check" aria-label="Mark step done"></button>
-        <div class="step-title"><span class="step-num">A1</span><h3>Check you have what you need</h3></div>
+        <div class="step-title"><span class="step-num">A2</span><h3>Check you have what you need</h3></div>
         <div class="step-body">
           <ul>
             <li>Python 3.10 or newer. Check with <code>python3 --version</code>.</li>
             <li>A TypeSafe API key from <a href="https://console.typesafe.ai/keys">console.typesafe.ai/keys</a>. No key yet? You can still do Part A and B, and the game will use the built-in heuristic bot instead of Jev.</li>
-            <li>The <code>jev-tetris-workshop</code> folder on your machine, opened in a terminal or in PyCharm.</li>
+            <li>The project cloned in step A1, opened in a terminal or in PyCharm.</li>
           </ul>
         </div>
       </li>
       <li class="step" data-step="a2">
         <button class="check" aria-label="Mark step done"></button>
-        <div class="step-title"><span class="step-num">A2</span><h3>Create a virtual environment and install</h3></div>
+        <div class="step-title"><span class="step-num">A3</span><h3>Create a virtual environment and install</h3></div>
         <div class="step-body">
           <div class="code"><pre><code>python3 -m venv venv
 source venv/bin/activate      # Windows: venv\Scripts\activate
@@ -212,7 +223,7 @@ pip install -r requirements.txt</code></pre><button class="copy">Copy</button></
       </li>
       <li class="step" data-step="a3">
         <button class="check" aria-label="Mark step done"></button>
-        <div class="step-title"><span class="step-num">A3</span><h3>Add your API key</h3></div>
+        <div class="step-title"><span class="step-num">A4</span><h3>Add your API key</h3></div>
         <div class="step-body">
           <div class="code"><pre><code>cp .env.example .env</code></pre><button class="copy">Copy</button></div>
           <p>Open <code>.env</code> and paste your key after <code>TYPESAFE_API_KEY=</code>. The file must be named exactly <code>.env</code>. It's already in <code>.gitignore</code>, so the key won't be committed.</p>
@@ -220,16 +231,16 @@ pip install -r requirements.txt</code></pre><button class="copy">Copy</button></
       </li>
       <li class="step" data-step="a4">
         <button class="check" aria-label="Mark step done"></button>
-        <div class="step-title"><span class="step-num">A4</span><h3>Start the server</h3></div>
+        <div class="step-title"><span class="step-num">A5</span><h3>Start the server</h3></div>
         <div class="step-body">
           <div class="code"><pre><code>python server/app.py</code></pre><button class="copy">Copy</button></div>
-          <p>Wait for <code>Running on http://127.0.0.1:3000</code>. If you see <code>⚠️ TYPESAFE_API_KEY is not set</code>, go back to A3. In PyCharm, right-click <code>server/app.py</code> → Run 'app'.</p>
+          <p>Wait for <code>Running on http://127.0.0.1:3000</code>. If you see <code>⚠️ TYPESAFE_API_KEY is not set</code>, go back to A4. In PyCharm, right-click <code>server/app.py</code> → Run 'app'.</p>
           <p class="muted" style="font-size:14px">Keep this terminal visible. The server logs every decision here, and it reloads by itself when you save <code>app.py</code>.</p>
         </div>
       </li>
       <li class="step" data-step="a5">
         <button class="check" aria-label="Mark step done"></button>
-        <div class="step-title"><span class="step-num">A5</span><h3>Check the server can see your key</h3></div>
+        <div class="step-title"><span class="step-num">A6</span><h3>Check the server can see your key</h3></div>
         <div class="step-body">
           <p>Open <a href="http://localhost:3000/api/health">localhost:3000/api/health</a> in your browser, or run:</p>
           <div class="code"><pre><code>curl localhost:3000/api/health</code></pre><button class="copy">Copy</button></div>
@@ -238,7 +249,7 @@ pip install -r requirements.txt</code></pre><button class="copy">Copy</button></
       </li>
       <li class="step" data-step="a6">
         <button class="check" aria-label="Mark step done"></button>
-        <div class="step-title"><span class="step-num">A6</span><h3>Start a game and find the logs</h3></div>
+        <div class="step-title"><span class="step-num">A7</span><h3>Start a game and find the logs</h3></div>
         <div class="step-body">
           <ol>
             <li>Open <a href="http://localhost:3000">localhost:3000</a> and press <b>Start</b>.</li>

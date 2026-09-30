@@ -448,8 +448,10 @@ answer = response.answers["placement"]   # .choice, .confidence, .probabilities<
       <span class="eyebrow">Getting it running</span>
       <h2>Setup</h2>
     </div>
-    <p>You need Python 3.10 or newer and a TypeSafe API key from <a href="https://console.typesafe.ai/keys">console.typesafe.ai/keys</a>. It also runs without a key, using the heuristic, so you can rehearse the workshop before your access arrives.</p>
-    <pre><code>python3 -m venv venv && source venv/bin/activate
+    <p>The code is on GitHub at <a href="https://github.com/arnonrodman/jev-tetris-workshop">github.com/arnonrodman/jev-tetris-workshop</a>. You need Git, Python 3.10 or newer and a TypeSafe API key from <a href="https://console.typesafe.ai/keys">console.typesafe.ai/keys</a>. It also runs without a key, using the heuristic, so you can rehearse the workshop before your access arrives.</p>
+    <pre><code>git clone https://github.com/arnonrodman/jev-tetris-workshop.git
+cd jev-tetris-workshop
+python3 -m venv venv && source venv/bin/activate
 pip install -r requirements.txt
 cp .env.example .env        # set TYPESAFE_API_KEY=...
 python server/app.py        # open http://localhost:3000 and press Start</code></pre>
