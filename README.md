@@ -61,11 +61,12 @@ If the server can't reach TypeSafe (no API key yet, network hiccup, request
 timeout), the browser automatically falls back to a small hand-written
 heuristic bot so the demo never just freezes — the UI tells you when this
 happens. The game engine, rendering, and this fallback logic all live in
-`public/tetris.js` (plain JavaScript) since they run in the browser; only the
+`public/index.html` (plain JavaScript) since they run in the browser; only the
 one call out to TypeSafe lives in Python.
 
 ## 2. Prerequisites
 
+- Git (`git --version` to check)
 - Python 3.10 or newer (`python3 --version` to check)
 - A TypeSafe AI account with API access and a key from
   <https://console.typesafe.ai/keys> (sign up for early access at
@@ -73,7 +74,10 @@ one call out to TypeSafe lives in Python.
 
 ## 3. Setup
 
+The code lives at <https://github.com/arnonrodman/jev-tetris-workshop>. Clone it and set it up:
+
 ```bash
+git clone https://github.com/arnonrodman/jev-tetris-workshop.git
 cd jev-tetris-workshop
 python3 -m venv venv
 source venv/bin/activate   # Windows: venv\Scripts\activate
@@ -103,9 +107,10 @@ mechanics before your API access comes through.
 
 ### 3a. Doing this in PyCharm instead of a terminal
 
-1. Unzip `jev-tetris-workshop.zip` anywhere on disk.
-2. **File → Open…** in PyCharm and select the unzipped `jev-tetris-workshop`
-   folder (open it as its own project, not as a subfolder of another one).
+1. **File → New → Project from Version Control…** in PyCharm, paste
+   `https://github.com/arnonrodman/jev-tetris-workshop.git` as the URL, and click **Clone**.
+2. Open the cloned `jev-tetris-workshop` folder as its own project (not as a
+   subfolder of another one). PyCharm does this for you after cloning.
 3. Set up the interpreter: **PyCharm → Settings/Preferences → Project:
    jev-tetris-workshop → Python Interpreter → Add Interpreter → Add Local
    Interpreter → Virtualenv Environment → New**, base interpreter Python 3.10+,
@@ -126,10 +131,8 @@ mechanics before your API access comes through.
    not `.env.example` or `.env.txt`).
 7. Open <http://localhost:3000> in your browser and click **Start**.
 
-To track this locally in git before you have a remote yet (see §10 for
-pushing once you do): **VCS → Enable Version Control Integration → Git**,
-then **VCS → Commit** (⌘K / Ctrl+K) to make your first commit. PyCharm
-already respects `.gitignore`, so `.env` and `venv/` won't be tracked.
+PyCharm already respects `.gitignore`, so `.env` and `venv/` won't be
+tracked when you commit your own changes (see §10).
 
 ## 4. Using the UI
 
@@ -147,7 +150,7 @@ already respects `.gitignore`, so `.env` and `venv/` won't be tracked.
 
 ## 5. How the state and question are built
 
-Every time a piece spawns, `public/tetris.js` computes the legal placements
+Every time a piece spawns, `public/index.html` computes the legal placements
 and sends a payload like this to the server:
 
 ```json
@@ -242,7 +245,7 @@ the demo run.
    instructions/criteria, not in hand-written branching logic.
 
 5. **Measure agreement with the heuristic.** Log `chosenId` (from Jev) vs.
-   the heuristic's own pick (computed client-side in `tetris.js`, via
+   the heuristic's own pick (computed client-side in `public/index.html`, via
    `pickHeuristic(placements)`) for every piece over a full game and compute
    an agreement percentage. This gives you your own, independently measured
    number to compare against TypeSafe's published benchmarks.
@@ -302,33 +305,18 @@ jev-tetris-workshop/
 > contained now lives in `public/index.html` and `server/app.py`
 > respectively. All four are safe to delete.
 
-## 10. Push this project to GitHub
+## 10. Saving your own work
 
-This project is meant to be checked into its own repository. Create a new,
-**empty** repository on GitHub first (don't let GitHub auto-generate a
-README, `.gitignore`, or license for you — that would conflict with the
-files already here).
-
-If you haven't initialized git locally yet (e.g. via §3a's PyCharm steps),
-do it from inside the `jev-tetris-workshop` folder:
+The workshop repo is shared, so push your exercise solutions to your own copy
+instead of to it. Fork <https://github.com/arnonrodman/jev-tetris-workshop> on GitHub (the **Fork** button, top right),
+then point your clone at the fork:
 
 ```bash
-git init
-git add .
-git commit -m "Initial commit: Jev Tetris workshop"
-git branch -M main
-```
-
-Either way, once you have both a local commit and an empty remote repo,
-point one at the other and push:
-
-```bash
+git remote rename origin upstream
 git remote add origin https://github.com/<your-username>/jev-tetris-workshop.git
 git push -u origin main
 ```
 
-Replace the `origin` URL with the one GitHub shows you right after creating
-the repo (the "…or push an existing repository from the command line"
-section on the new-repo page gives you these exact three lines already
-filled in with your username). `.env` is already excluded via `.gitignore`,
-so your API key will not be committed.
+To pick up later changes to the workshop, run `git pull upstream main`.
+`.env` is already excluded via `.gitignore`, so your API key will not be
+committed.

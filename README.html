@@ -165,7 +165,7 @@
     <a href="#troubleshooting">7. Troubleshooting</a>
     <a href="#security">8. Security</a>
     <a href="#structure">9. Structure</a>
-    <a href="#github">10. Push to GitHub</a>
+    <a href="#github">10. Your own work</a>
   </div>
 
   <div class="card" id="architecture">
@@ -198,7 +198,7 @@ Server → Browser
       If the server can't reach TypeSafe (no API key yet, network hiccup, request timeout), the browser
       automatically falls back to a small hand-written heuristic bot so the demo never just freezes — the
       UI tells you when this happens. The game engine, rendering, and this fallback logic all live in
-      <code>public/tetris.js</code> (plain JavaScript) since they run in the browser; only the one call out
+      <code>public/index.html</code> (plain JavaScript) since they run in the browser; only the one call out
       to TypeSafe lives in Python.
     </p>
   </div>
@@ -206,6 +206,7 @@ Server → Browser
   <div class="card" id="prereqs">
     <h2><span class="num">2</span>Prerequisites</h2>
     <ul>
+      <li>Git (<code>git --version</code> to check)</li>
       <li>Python 3.10 or newer (<code>python3 --version</code> to check)</li>
       <li>A TypeSafe AI account with API access and a key from
         <a href="https://console.typesafe.ai/keys" target="_blank" rel="noreferrer">console.typesafe.ai/keys</a>
@@ -216,7 +217,9 @@ Server → Browser
 
   <div class="card" id="setup">
     <h2><span class="num">3</span>Setup</h2>
-    <pre><code>cd jev-tetris-workshop
+    <p>The code lives at <a href="https://github.com/arnonrodman/jev-tetris-workshop" target="_blank" rel="noreferrer">github.com/arnonrodman/jev-tetris-workshop</a>. Clone it and set it up:</p>
+    <pre><code>git clone https://github.com/arnonrodman/jev-tetris-workshop.git
+cd jev-tetris-workshop
 python3 -m venv venv
 source venv/bin/activate   # Windows: venv\Scripts\activate
 pip install -r requirements.txt
@@ -238,8 +241,8 @@ PORT=3000</code></pre>
 
     <h3 id="pycharm">3a. Doing this in PyCharm instead of a terminal</h3>
     <ol>
-      <li>Unzip <code>jev-tetris-workshop.zip</code> anywhere on disk.</li>
-      <li><strong>File → Open…</strong> in PyCharm and select the unzipped <code>jev-tetris-workshop</code> folder (open it as its own project, not as a subfolder of another one).</li>
+      <li><strong>File → New → Project from Version Control…</strong> in PyCharm, paste <code>https://github.com/arnonrodman/jev-tetris-workshop.git</code> as the URL, and click <strong>Clone</strong>.</li>
+      <li>Open the cloned <code>jev-tetris-workshop</code> folder as its own project (not as a subfolder of another one). PyCharm does this for you after cloning.</li>
       <li>Set up the interpreter: <strong>PyCharm → Settings/Preferences → Project: jev-tetris-workshop → Python Interpreter → Add Interpreter → Add Local Interpreter → Virtualenv Environment → New</strong>, base interpreter Python 3.10+, location defaults to <code>jev-tetris-workshop/venv</code> — leave it and click OK. PyCharm creates the venv and switches the project to it.</li>
       <li>Open the built-in <strong>Terminal</strong> tab (bottom of the window) — it auto-activates the venv you just created — and run:
         <pre><code>pip install -r requirements.txt
@@ -250,10 +253,8 @@ cp .env.example .env</code></pre>
       <li>Open <a href="http://localhost:3000">http://localhost:3000</a> in your browser and click <strong>Start</strong>.</li>
     </ol>
     <p>
-      To track this locally in git before you have a remote yet (see §10 for pushing once you do):
-      <strong>VCS → Enable Version Control Integration → Git</strong>, then <strong>VCS → Commit</strong>
-      (⌘K / Ctrl+K) to make your first commit. PyCharm already respects <code>.gitignore</code>, so
-      <code>.env</code> and <code>venv/</code> won't be tracked.
+      PyCharm already respects <code>.gitignore</code>, so <code>.env</code> and <code>venv/</code> won't be
+      tracked when you commit your own changes (see §10).
     </p>
   </div>
 
@@ -279,7 +280,7 @@ cp .env.example .env</code></pre>
 
   <div class="card" id="state">
     <h2><span class="num">5</span>How the state and question are built</h2>
-    <p>Every time a piece spawns, <code>public/tetris.js</code> computes the legal placements and sends a payload like this to the server:</p>
+    <p>Every time a piece spawns, <code>public/index.html</code> computes the legal placements and sends a payload like this to the server:</p>
     <pre><code>{
   "board": ["..........", "..........", "...", "XXXXXXXX.."],
   "currentPiece": "T",
@@ -338,7 +339,7 @@ print(response.answers["placement"].probabilities)</code></pre>
       <li><strong>Add a Noul question for Hold.</strong> Right now the game never uses the hold slot in AI mode. Add a second question to the same request: <code>Noul(instructions="Would holding the current piece and playing the next one instead lead to a better outcome?")</code>. If Jev answers yes with high confidence, tell the frontend to call <code>holdPiece()</code> before computing placements for the swapped piece.</li>
       <li><strong>Add a Score question for board quality.</strong> Ask Jev to <code>Score(instructions="Rate how healthy this board's surface is", criteria=[...])</code> on the <em>resulting</em> board after each placement, and log it alongside the heuristic's own score in <code>server/app.py</code>. Do they agree? This is a good way to sanity-check Jev's judgment against a simple formula you fully understand.</li>
       <li><strong>Change the instructions, not the code.</strong> Edit only the <code>instructions</code> string passed to <code>Choice(...)</code> in <code>server/app.py</code> (e.g. "aggressively prioritize clearing multiple lines at once even if it means a taller stack") and observe how Jev's choices shift — no game logic changes needed. This is the "atomic questions, composed in code" idea from TypeSafe's docs: behavior changes are supposed to live in the instructions/criteria, not in hand-written branching logic.</li>
-      <li><strong>Measure agreement with the heuristic.</strong> Log <code>chosenId</code> (from Jev) vs. the heuristic's own pick (computed client-side in <code>tetris.js</code>, via <code>pickHeuristic(placements)</code>) for every piece over a full game and compute an agreement percentage. This gives you your own, independently measured number to compare against TypeSafe's published benchmarks.</li>
+      <li><strong>Measure agreement with the heuristic.</strong> Log <code>chosenId</code> (from Jev) vs. the heuristic's own pick (computed client-side in <code>public/index.html</code>, via <code>pickHeuristic(placements)</code>) for every piece over a full game and compute an agreement percentage. This gives you your own, independently measured number to compare against TypeSafe's published benchmarks.</li>
     </ol>
   </div>
 
@@ -370,6 +371,9 @@ print(response.answers["placement"].probabilities)</code></pre>
 ├── PROMPT.md               the detailed spec this project was built from
 ├── requirements.txt        flask, python-dotenv, typesafe-sdk
 ├── .env.example            copy to .env and add your API key
+├── docs/
+│   ├── workshop-overview.html   what Jev is and how the workshop works
+│   └── participant-guide.html   step-by-step checklist for each participant
 ├── server/
 │   └── app.py               Flask server + the one TypeSafe API call
 └── public/
@@ -386,28 +390,18 @@ print(response.answers["placement"].probabilities)</code></pre>
   </div>
 
   <div class="card" id="github">
-    <h2><span class="num">10</span>Push this project to GitHub</h2>
+    <h2><span class="num">10</span>Saving your own work</h2>
     <p>
-      This project is meant to be checked into its own repository. Create a new, <strong>empty</strong>
-      repository on GitHub first (don't let GitHub auto-generate a README, <code>.gitignore</code>, or
-      license for you — that would conflict with the files already here).
+      The workshop repo is shared, so push your exercise solutions to your own copy instead of to it. Fork
+      <a href="https://github.com/arnonrodman/jev-tetris-workshop" target="_blank" rel="noreferrer">the repo</a> on GitHub (the <strong>Fork</strong>
+      button, top right), then point your clone at the fork:
     </p>
-    <p>
-      If you haven't initialized git locally yet (e.g. via §3a's PyCharm steps), do it from inside the
-      <code>jev-tetris-workshop</code> folder:
-    </p>
-    <pre><code>git init
-git add .
-git commit -m "Initial commit: Jev Tetris workshop"
-git branch -M main</code></pre>
-    <p>Either way, once you have both a local commit and an empty remote repo, point one at the other and push:</p>
-    <pre><code>git remote add origin https://github.com/&lt;your-username&gt;/jev-tetris-workshop.git
+    <pre><code>git remote rename origin upstream
+git remote add origin https://github.com/&lt;your-username&gt;/jev-tetris-workshop.git
 git push -u origin main</code></pre>
     <p>
-      Replace the <code>origin</code> URL with the one GitHub shows you right after creating the repo (the
-      "…or push an existing repository from the command line" section on the new-repo page gives you these
-      exact three lines already filled in with your username). <code>.env</code> is already excluded via
-      <code>.gitignore</code>, so your API key will not be committed.
+      To pick up later changes to the workshop, run <code>git pull upstream main</code>. <code>.env</code> is
+      already excluded via <code>.gitignore</code>, so your API key will not be committed.
     </p>
   </div>
 

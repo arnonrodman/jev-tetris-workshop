@@ -38,7 +38,6 @@ Jev's behavior is meant to be tuned through the `instructions` string and criter
 ## Gotchas
 
 - `public/tetris.js`, `public/style.css`, `server/index.js`, and `package.json` are deprecated stubs from earlier iterations (multi-file frontend, Node server). Nothing references them. Don't add code there.
-- Some README text (§1, §5, §6 exercise 5) still says the engine and `pickHeuristic` live in `public/tetris.js`. They are actually in `public/index.html`.
 - The API key must never reach the browser. Keep the `client.system_one(...)` call server-side. `.env` is gitignored.
 - The UI must not copy the branded trade dress of any official Tetris product. Stick to generic falling-block conventions (see `PROMPT.md` §1).
 - `README.html` is a hand-maintained styled copy of `README.md`. If you change one, update the other.
