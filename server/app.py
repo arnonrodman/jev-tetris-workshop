@@ -85,13 +85,7 @@ def decide_placement():
             },
             questions={
                 "placement": Choice(
-                    instructions=(
-                        "Choose the best final placement (rotation + column) for the falling Tetris "
-                        "piece, out of the given legal options. Prefer placements that clear lines, "
-                        "avoid creating holes, keep the stack low, and keep the surface flat (low "
-                        "bumpiness). Avoid placements that build a tall or uneven stack that risks a "
-                        "future top-out."
-                    ),
+
                     criteria=criteria,
                 ),
             },

@@ -31,6 +31,8 @@ Two runtime files hold all the logic:
   - rendering (canvas) and the `requestAnimationFrame` loop / `tick`
 - **`server/app.py`**: a thin Flask proxy that keeps the API key server-side. `/api/decide-placement` checks that there are between 1 and 255 placements (255 is the Choice option limit). It turns each placement into a plain-language criterion string keyed by placement id (`p0`, `p1`, …) and calls `client.system_one(state=..., questions={"placement": Choice(...)})` from `typesafe_sdk`. It returns `{chosenId, confidence, probabilities, model, latencyMs}`, or 502 on any SDK/network error.
 
+Without `TYPESAFE_API_KEY`, `client` is `None` and `/api/decide-placement` returns 503, which triggers the frontend heuristic. The frontend reports every heuristic move to `/api/log-fallback` (204, logged as a warning) so client-side timeouts show up in the server terminal. `/api/health` reports `hasApiKey`.
+
 Contract coupling: the placement fields that `enumeratePlacements` produces, the fields `requestAIDecision` sends, and the keys `app.py` reads (`p["columns"]`, `p["holes"]`, etc.) must stay in sync. If you add a placement feature, update all three.
 
 Jev's behavior is meant to be tuned through the `instructions` string and criteria text in `app.py`, not through branching game logic (see README §6 workshop exercises).
@@ -40,4 +42,5 @@ Jev's behavior is meant to be tuned through the `instructions` string and criter
 - `public/tetris.js`, `public/style.css`, `server/index.js`, and `package.json` are deprecated stubs from earlier iterations (multi-file frontend, Node server). Nothing references them. Don't add code there.
 - The API key must never reach the browser. Keep the `client.system_one(...)` call server-side. `.env` is gitignored.
 - The UI must not copy the branded trade dress of any official Tetris product. Stick to generic falling-block conventions (see `PROMPT.md` §1).
+- `docs/workshop-overview.html` and `docs/participant-guide.html` are hand-written workshop handouts. Update them if setup steps or the Jev call flow change.
 - `README.html` is a hand-maintained styled copy of `README.md`. If you change one, update the other.
