@@ -420,8 +420,7 @@
            "next_piece": "L", "held_piece": "none", ...},
     questions={
         "placement": Choice(
-            instructions="Choose the best final placement ... Prefer placements that clear "
-                         "lines, avoid creating holes, keep the stack low, and keep the surface flat.",
+            # no instructions yet: Jev decides from the criteria alone (exercise 4 adds them)
             criteria={"p0": "Rotation state 0, occupies column(s) ...", "p1": "...", ...},
         ),
     },
@@ -503,8 +502,8 @@ answer = response.answers["placement"]   # .choice, .confidence, .probabilities<
       </li>
       <li>
         <span class="num">4</span>
-        <h3>Change the instructions, not the code</h3>
-        <p>Edit only the <code>instructions</code> string passed to <code>Choice(...)</code>, for example "aggressively prioritize clearing multiple lines at once even if it means a taller stack", and see how Jev's play changes with no change to game logic.</p>
+        <h3>Write Jev's instructions</h3>
+        <p>The <code>Choice(...)</code> question ships with no <code>instructions</code>, so Jev picks using only the one-line description of each placement. Play a game like that first. Then write instructions that say what a good placement is, play again and compare. Then try a different strategy, such as "aggressively prioritize clearing multiple lines at once even if it means a taller stack". The game logic stays the same throughout.</p>
         <div class="tags"><span class="pill">prompt-level behavior</span></div>
       </li>
       <li>

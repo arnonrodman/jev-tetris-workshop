@@ -377,17 +377,29 @@ app.logger.info("[jev] board health %.2f (confidence %.2f)", health.score, healt
 
       <li class="step" data-step="c4">
         <button class="check" aria-label="Mark step done"></button>
-        <div class="step-title"><span class="step-num">C4</span><h3>Change the instructions, not the code</h3></div>
+        <div class="step-title"><span class="step-num">C4</span><h3>Write Jev's instructions</h3></div>
         <div class="step-body">
-          <p class="ex-goal">Change how Jev plays by editing only the <code>instructions</code> text in <code>Choice(...)</code>.</p>
-          <p>Try one of these, save, and watch a game. The server reloads on save.</p>
+          <p class="ex-goal">The <code>Choice(...)</code> in <code>server/app.py</code> has no <code>instructions</code>. Jev only sees the one-line description of each placement. Write the instructions yourself and see how much they change its play.</p>
+          <ol>
+            <li>Play one game with no instructions. Note how the stack looks and how often the log shows low confidence.</li>
+            <li>Add an <code>instructions</code> argument that says what a good placement is, save, and play again. The server reloads on save.</li>
+            <li>Then try a different strategy from the list below.</li>
+          </ol>
+          <div class="code"><span class="file">server/app.py</span><pre><code>"placement": Choice(
+    instructions=(
+        "Choose the best final placement for the falling piece. Prefer "
+        "placements that clear lines, avoid creating holes, keep the stack "
+        "low, and keep the surface flat."
+    ),
+    criteria=criteria,
+),</code></pre><button class="copy">Copy</button></div>
           <ul>
             <li>"Aggressively prioritize clearing multiple lines at once, even if it means a taller stack."</li>
             <li>"Keep column 9 empty so an I piece can clear four lines at once."</li>
             <li>"Play as safely as possible: never let any column get above height 6."</li>
           </ul>
-          <div class="done-when"><b>Done when</b> you can point to a visible change in how the stack is built.</div>
-          <div class="notes"><label for="note-c4">Which instruction did you try, and what changed?</label><textarea id="note-c4" data-note="c4"></textarea></div>
+          <div class="done-when"><b>Done when</b> you can describe how the game with no instructions differs from the game with yours.</div>
+          <div class="notes"><label for="note-c4">Without instructions vs. with yours: what changed? Which strategy did you try?</label><textarea id="note-c4" data-note="c4"></textarea></div>
         </div>
       </li>
 
@@ -420,7 +432,7 @@ console.log(`[agree] ${agreement.same}/${agreement.total} = ` +
       <ul>
         <li>Your agreement percentage from C5, and how many pieces it covered.</li>
         <li>One board where Jev was unsure, and whether you would have been unsure too.</li>
-        <li>The instruction change from C4 that had the biggest effect.</li>
+        <li>How Jev played with no instructions compared with yours from C4.</li>
         <li>Whether you'd trust Jev for this decision in production, and at what confidence threshold.</li>
       </ul>
       <p style="font-size:14.5px">This collects your notes into one block you can paste into the group chat:</p>

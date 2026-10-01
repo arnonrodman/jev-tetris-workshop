@@ -35,7 +35,7 @@ Without `TYPESAFE_API_KEY`, `client` is `None` and `/api/decide-placement` retur
 
 Contract coupling: the placement fields that `enumeratePlacements` produces, the fields `requestAIDecision` sends, and the keys `app.py` reads (`p["columns"]`, `p["holes"]`, etc.) must stay in sync. If you add a placement feature, update all three.
 
-Jev's behavior is meant to be tuned through the `instructions` string and criteria text in `app.py`, not through branching game logic (see README §6 workshop exercises).
+Jev's behavior is meant to be tuned through the `Choice` instructions and criteria text in `app.py`, not through branching game logic. The `Choice` deliberately has no `instructions` argument: participants write it in workshop exercise 4 (README §6, `docs/participant-guide.html` C4). Don't add it back.
 
 ## Gotchas
 

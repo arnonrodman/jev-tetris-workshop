@@ -307,12 +307,8 @@ response = client.system_one(
     },
     questions={
         "placement": Choice(
-            instructions=(
-                "Choose the best final placement (rotation + column) for the "
-                "falling Tetris piece... Prefer placements that clear lines, "
-                "avoid creating holes, keep the stack low, and keep the "
-                "surface flat."
-            ),
+            # No instructions yet: Jev decides from the criteria alone.
+            # Exercise 4 has you write them.
             criteria={
                 "p0": "Rotation state 0, occupies column(s) 3, 4, 5. Landing here clears 0 line(s) ...",
                 "p1": "Rotation state 1, occupies column(s) 7, 8. Landing here clears 1 line(s) ...",
@@ -338,7 +334,7 @@ print(response.answers["placement"].probabilities)</code></pre>
       <li><strong>Read the confidence signal.</strong> Play a few dozen pieces and watch the confidence bar. Does it drop on genuinely ambiguous boards (several similarly-good placements) and stay high when one placement is clearly best? Try adding a rule in <code>server/app.py</code>: when confidence is below, say, 0.3, return a flag the frontend uses to prefer the heuristic bot instead of trusting Jev's pick — this mirrors the "confidence-gated automation" pattern TypeSafe's docs describe.</li>
       <li><strong>Add a Noul question for Hold.</strong> Right now the game never uses the hold slot in AI mode. Add a second question to the same request: <code>Noul(instructions="Would holding the current piece and playing the next one instead lead to a better outcome?")</code>. If Jev answers yes with high confidence, tell the frontend to call <code>holdPiece()</code> before computing placements for the swapped piece.</li>
       <li><strong>Add a Score question for board quality.</strong> Ask Jev to <code>Score(instructions="Rate how healthy this board's surface is", criteria=[...])</code> on the <em>resulting</em> board after each placement, and log it alongside the heuristic's own score in <code>server/app.py</code>. Do they agree? This is a good way to sanity-check Jev's judgment against a simple formula you fully understand.</li>
-      <li><strong>Change the instructions, not the code.</strong> Edit only the <code>instructions</code> string passed to <code>Choice(...)</code> in <code>server/app.py</code> (e.g. "aggressively prioritize clearing multiple lines at once even if it means a taller stack") and observe how Jev's choices shift — no game logic changes needed. This is the "atomic questions, composed in code" idea from TypeSafe's docs: behavior changes are supposed to live in the instructions/criteria, not in hand-written branching logic.</li>
+      <li><strong>Write Jev's instructions.</strong> The <code>Choice(...)</code> in <code>server/app.py</code> has no <code>instructions</code>, so Jev picks using only the option descriptions. Play one game like that and note how the stack looks. Then add an <code>instructions="..."</code> argument that says what a good placement is (e.g. "Prefer placements that clear lines, avoid creating holes, keep the stack low, and keep the surface flat") and play again. Then try a different strategy, such as "aggressively prioritize clearing multiple lines at once even if it means a taller stack". No game logic changes are needed. This is the "atomic questions, composed in code" idea from TypeSafe's docs: behavior changes are supposed to live in the instructions/criteria, not in hand-written branching logic.</li>
       <li><strong>Measure agreement with the heuristic.</strong> Log <code>chosenId</code> (from Jev) vs. the heuristic's own pick (computed client-side in <code>public/index.html</code>, via <code>pickHeuristic(placements)</code>) for every piece over a full game and compute an agreement percentage. This gives you your own, independently measured number to compare against TypeSafe's published benchmarks.</li>
     </ol>
   </div>

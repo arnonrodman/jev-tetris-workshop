@@ -185,12 +185,8 @@ response = client.system_one(
     },
     questions={
         "placement": Choice(
-            instructions=(
-                "Choose the best final placement (rotation + column) for the "
-                "falling Tetris piece... Prefer placements that clear lines, "
-                "avoid creating holes, keep the stack low, and keep the "
-                "surface flat."
-            ),
+            # No instructions yet: Jev decides from the criteria alone.
+            # Exercise 4 has you write them.
             criteria={
                 "p0": "Rotation state 0, occupies column(s) 3, 4, 5. Landing here clears 0 line(s) ...",
                 "p1": "Rotation state 1, occupies column(s) 7, 8. Landing here clears 1 line(s) ...",
@@ -236,13 +232,17 @@ the demo run.
    way to sanity-check Jev's judgment against a simple formula you fully
    understand.
 
-4. **Change the instructions, not the code.** Edit only the `instructions`
-   string passed to `Choice(...)` in `server/app.py` (e.g. "aggressively
-   prioritize clearing multiple lines at once even if it means a taller
-   stack") and observe how Jev's choices shift — no game logic changes
-   needed. This is the "atomic questions, composed in code" idea from
-   TypeSafe's docs: behavior changes are supposed to live in the
-   instructions/criteria, not in hand-written branching logic.
+4. **Write Jev's instructions.** The `Choice(...)` in `server/app.py` has
+   no `instructions`, so Jev picks using only the option descriptions. Play
+   one game like that and note how the stack looks. Then add an
+   `instructions="..."` argument that says what a good placement is (e.g.
+   "Prefer placements that clear lines, avoid creating holes, keep the stack
+   low, and keep the surface flat") and play again. Then try a different
+   strategy, such as "aggressively prioritize clearing multiple lines at once
+   even if it means a taller stack". No game logic changes are needed. This
+   is the "atomic questions, composed in code" idea from TypeSafe's docs:
+   behavior changes are supposed to live in the instructions/criteria, not in
+   hand-written branching logic.
 
 5. **Measure agreement with the heuristic.** Log `chosenId` (from Jev) vs.
    the heuristic's own pick (computed client-side in `public/index.html`, via
